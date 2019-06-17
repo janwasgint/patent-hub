@@ -1,0 +1,22 @@
+version: "3"
+services:
+  truffle-dev:
+    hostname: truffle-dev
+    build:
+      context: ./truffle
+    networks:
+      blc-dev-env:
+        ipv4_address: 172.16.0.4
+    ports:
+      - 8545:8545 # needed by ganach-cli
+      - 3000:3000 # needed by yarn
+    command: bash
+    stdin_open: true
+    tty: true
+    container_name: truffle-dev
+    volumes:
+      - ./truffle-code:/root/code
+
+networks:
+  blc-dev-env:
+    external: true
