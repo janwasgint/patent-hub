@@ -1,1 +1,1 @@
-# BlockchainPatentHub
+# Patent Hub
