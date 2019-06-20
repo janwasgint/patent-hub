@@ -12,13 +12,14 @@ contract Host {
 	mapping(address => bool) public nationalizers;
 	mapping(address => bool) public patentOffices;
 
-	constructor() public {
-		host = msg.sender;
-	}
-
 	/// modifiers 
 	modifier onlyHost() {
 		require(msg.sender == host);
+		_;
+	}
+
+	modifier onlyInventor(address inventor) {
+		require (isRegisteredAsInventor(inventor))
 		_;
 	}
 
