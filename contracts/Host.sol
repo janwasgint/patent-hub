@@ -1,4 +1,4 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.5.2;
 import "./Helper.sol";
 
 contract Host is Helper {

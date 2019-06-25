@@ -1,4 +1,4 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.5.2;
 import "./Host.sol";
 
 /// The patent hub will be hosted by one of the inovators
@@ -31,7 +31,6 @@ contract PatentHub is Host {
 
 	// events for communication with frontend
 	event contributionPhaseFinished(address[] indexed inventors, uint[] indexed shares);
-	event contributionListEvent(address indexed inventor, string indexed contributionFileHashIds);
 
 	constructor() public {
 		host = msg.sender;
@@ -39,12 +38,20 @@ contract PatentHub is Host {
 	}
 
 	// functions - share proposal
-	function addContribution(string ipfsFileHashId) public onlyInventor(msg.sender) {
+	function addContribution(string memory ipfsFileHashId) public onlyInventor(msg.sender) {
 		contributionFileHashIds[msg.sender].push(ipfsFileHashId);
 	}
 
-	function addShareProposal(address[] inventors, uint[] percentages) public onlyInventor(msg.sender) {
-		require(inventors.length == shares.length);
+	function addShareProposal(address[] memory inventors, uint[] memory percentages) public onlyInventor(msg.sender) {
+	   // require(inventors.length == shares.length);
+	    
+	    uint sum = 0;
+	    for (uint i=0; i<percentages.length; i++) {
+            sum += percentages[i];
+        }
+        
+        // require(sum == 100);
+	   
 		delete shares;
 		for (uint i=0; i<inventors.length; i++) {
             Share memory share = Share(inventors[i], percentages[i], false);
@@ -52,7 +59,7 @@ contract PatentHub is Host {
         }
 	}
 
-	function getContributions(address inventor) public view returns(string) {
+	function getContributions(address inventor) public view returns(string memory) {
 		bool hasAccess = false;
 		if (isRegisteredAsInventor(msg.sender)) {
 			hasAccess = true;
