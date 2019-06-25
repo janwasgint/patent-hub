@@ -1,6 +1,7 @@
 pragma solidity ^0.4.4;
+import "./Helper.sol";
 
-contract Host {
+contract Host is Helper {
 
 	/// address of the node initializing the contract and managing the identities
 	address public host;
@@ -19,7 +20,7 @@ contract Host {
 	}
 
 	modifier onlyInventor(address inventor) {
-		require (isRegisteredAsInventor(inventor))
+		require (isRegisteredAsInventor(inventor));
 		_;
 	}
 
@@ -35,7 +36,7 @@ contract Host {
 
 	/// functions for registering 3rd parties
 	function registerInventor(address inventor) public onlyHost {
-		inventors[inventor] = true;	
+		inventors[inventor] = true;
 	}
 
 	function registerPatentAgent(address patentAgent) public onlyHost {
