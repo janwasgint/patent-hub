@@ -8,6 +8,7 @@ contract Host is Helper {
 
 	/// registered 3rd parties
 	mapping(address => bool) public inventors;
+	address[] public allInventors;
 	mapping(address => bool) public patentAgents;
 	mapping(address => bool) public drawers;
 	mapping(address => bool) public nationalizers;
@@ -36,7 +37,11 @@ contract Host is Helper {
 
 	/// functions for registering 3rd parties
 	function registerInventor(address inventor) public onlyHost {
+	    if (inventors[inventor] == false) {
+	        allInventors.push(inventor);
+	    }
 		inventors[inventor] = true;
+		
 	}
 
 	function registerPatentAgent(address patentAgent) public onlyHost {

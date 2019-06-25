@@ -21,16 +21,20 @@ contract PatentHub is Host {
 		address patentAgent;
 	}
 
+
 	// properties
+	    // contribution phase
 	mapping(address => string[]) contributionFileHashIds;
 	Share[] shares;
 	bool shareProposalAcceptedByAll;
 
+        // patent agent contracting phase
 	PatentAgentInventorsContract patentAgentInventorsContract;
 	mapping(address => PatentAgentThirdPartyContract) thirdPartyContracts;
 
+
 	// events for communication with frontend
-	event contributionPhaseFinished(address[] indexed inventors, uint[] indexed shares);
+	event contributionPhaseFinished();
 
 	constructor() public {
 		host = msg.sender;
@@ -42,16 +46,30 @@ contract PatentHub is Host {
 		contributionFileHashIds[msg.sender].push(ipfsFileHashId);
 	}
 
-	function addShareProposal(address[] memory inventors, uint[] memory percentages) public onlyInventor(msg.sender) {
-	   // require(inventors.length == shares.length);
+	function addSharesProposal(address[] memory inventors, uint[] memory percentages) public onlyInventor(msg.sender) {
+	    require(inventors.length == percentages.length);
 	    
+	    // check whether all inventors are included in the shares porposal
+		for (uint i=0; i<allInventors.length; i++) {
+		    bool isIncluded = false;
+		    
+		    for (uint j=0; j<inventors.length; j++) {
+		        if (allInventors[i] == inventors[j]) {
+		            isIncluded = true;
+		        }
+		    }
+		    
+		    require(isIncluded);
+		}
+	    
+	    // check whether percentages amount to 100
 	    uint sum = 0;
 	    for (uint i=0; i<percentages.length; i++) {
             sum += percentages[i];
         }
-        
-        // require(sum == 100);
+        require(sum == 100);
 	   
+	    // store the shares
 		delete shares;
 		for (uint i=0; i<inventors.length; i++) {
             Share memory share = Share(inventors[i], percentages[i], false);
@@ -87,9 +105,7 @@ contract PatentHub is Host {
 		return share;
 	}
 
-	function approveShare() public {
-		address[] memory inventors;
-		uint[] memory percentages;
+	function approveShare() public onlyInventor(msg.sender) {
 		shareProposalAcceptedByAll = true;
 
 		for (uint i=0; i<shares.length; i++) {
@@ -97,12 +113,14 @@ contract PatentHub is Host {
 				shares[i].accepted = true;
 			}
 			shareProposalAcceptedByAll = shareProposalAcceptedByAll && shares[i].accepted;
-			inventors[i] = shares[i].shareholder;
-			percentages[i] = shares[i].percentage;
         }
 
         if (shareProposalAcceptedByAll) {
-        	emit contributionPhaseFinished(inventors, percentages);
+        	emit contributionPhaseFinished();
         }
+	}
+	
+	function sharesAcceptedByAllInventors() public view returns(bool) {
+	    return shareProposalAcceptedByAll;
 	}
 }
