@@ -17,6 +17,7 @@ contract PatentHub is Host {
 		string ipfsFileHashId;
 		uint payment;
 		mapping(address => bool) inventorsConsent;
+        bool valid;
 	}
 
 	// triggered when inventors need to approve a contract
@@ -129,19 +130,19 @@ contract PatentHub is Host {
 	}
 
 	// functions - contracting phase
-	function uploadInventorsContract(string ipfsFileHashId) public onlyPatentAgent(msg.sender) {
+	function uploadInventorsContract(string memory ipfsFileHashId) public onlyPatentAgent(msg.sender) {
 		require(shareProposalAcceptedByAll);
 		patentAgentInventorsContract.patentAgent = msg.sender;
 		patentAgentInventorsContract.ipfsFileHashId = ipfsFileHashId;
 		patentAgentInventorsContract.valid = false;
 		for (uint i = 0; i < allInventors.length; i++) {
-			emit approvePatentAgentContractRequest(msg.sender, allInnventors[i], ipfsFileHashId);
+			emit approvePatentAgentContractRequest(msg.sender, allInventors[i], ipfsFileHashId);
 		}
 	}
 
 	function approvePatentAgentContract() public onlyInventor(msg.sender) {	
 		require(shareProposalAcceptedByAll && patentAgentInventorsContract.valid == false);
-		inventorsConsent[msg.sender] = true;
+		patentAgentInventorsContract.inventorsConsent[msg.sender] = true;
 
 		bool allInventorsConsented = true;
 		for (uint i = 0; i < allInventors.length; i++) {
@@ -149,7 +150,7 @@ contract PatentHub is Host {
 		}
 
 		if (allInventorsConsented) {
-			emit contractApproved(approvePatentAgentContract.ipfsFileHashId);
+			emit contractApproved(patentAgentInventorsContract.ipfsFileHashId);
 		}
 	}
 }
