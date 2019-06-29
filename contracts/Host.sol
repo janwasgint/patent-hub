@@ -12,6 +12,7 @@ contract Host is Helper {
 	mapping(address => bool) public patentAgents;
 	mapping(address => bool) public drawers;
 	mapping(address => bool) public nationalizers;
+	mapping(address => bool) public translators;
 	mapping(address => bool) public patentOffices;
 
 	/// modifiers 
@@ -25,12 +26,18 @@ contract Host is Helper {
 		_;
 	}
 
+	modifier onlyPatentAgent(address patentAgent) {
+		require (isRegisteredAsPatentAgent(patentAgent));
+		_;
+	}
+
     modifier only3rdParty(address actor) {
     	require (
     		isRegisteredAsInventor(actor) ||
     		isRegisteredAsPatentAgent(actor) ||
     		isRegisteredAsDrawer(actor) ||
     		isRegisteredAsNationalizer(actor) ||
+    		isRegisteredAsTranslator(actor) ||
     		isRegisteredAsPatentOffice(actor));
     	_;
     }
@@ -40,8 +47,7 @@ contract Host is Helper {
 	    if (inventors[inventor] == false) {
 	        allInventors.push(inventor);
 	    }
-		inventors[inventor] = true;
-		
+		inventors[inventor] = true;	
 	}
 
 	function registerPatentAgent(address patentAgent) public onlyHost {
@@ -54,6 +60,10 @@ contract Host is Helper {
 
 	function registerNationalizer(address nationalizer) public onlyHost {
 		nationalizers[nationalizer] = true;
+	}
+
+    function registerTranslator(address translator) public onlyHost {
+		translators[translator] = true;
 	}
 
 	function registerPatentOffices(address patentOffice) public onlyHost {
@@ -75,6 +85,10 @@ contract Host is Helper {
 
 	function isRegisteredAsNationalizer(address nationalizer) public view returns(bool) {
 		return nationalizers[nationalizer];
+	}
+
+    function isRegisteredAsTranslator(address translator) public view returns(bool) {
+		return translators[translator];
 	}
 
 	function isRegisteredAsPatentOffice(address patentOffice) public view returns(bool) {
