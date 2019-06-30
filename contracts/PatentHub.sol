@@ -31,6 +31,7 @@ contract PatentHub is Host {
 	    string abstractText;
 	    string summaryText;
 	    string drawingsIpfsFileHash;
+	    bool acceptedByPatentOffice;
 	}
 	
 	struct ThirdPartyPatentAgentContract {
@@ -43,10 +44,10 @@ contract PatentHub is Host {
 	
 	    // third party to third party contacting phase
 	struct ThirdPartyThirdPartyContract {
-	    address proposerAddress;
-	    string proposerPersona; // 'nationalizer', 'translator' or 'patent office'
+	    address payable proposerAddress;
+	    string proposerPersona; // 'translator' or 'patent office'
 	    address approverAddress;
-	    string apporverPersona; // 'nationalizer', 'translator' or 'patent office'
+	    string approverPersona; // currently always 'nationalizer'
 	    string ipfsFileHash;
 	    uint payment;
 	    bool signed;
@@ -92,10 +93,16 @@ contract PatentHub is Host {
             // when a third party proposes a contract
     event approveContractRequest(address indexed proposerAddress, string proposerPersona, address indexed approverAddress, string approverPersona, uint payment, string ipfsFileHash);
     
-            // when the approving third party consents
-    event contractApproved(address indexed proposerAddress, string proposerPersona, address indexed approverAddress, string approverPersona, uint payment, string ipfsFileHash);
-        
-
+            // when the approving third party consentsface
+    event contractApproved(address indexed proposerAddress, string proposerPersona, address indexed approverAddress, string approverPersona, string ipfsFileHash);
+    
+        // patent office submission and payment handling
+            // when the process is completed and a settling of payments is requested
+    event paymentRequest(address indexed deptor, address indexed deptee, uint amount);
+    
+            // when all payments are settled
+    event nationalPatentAccepted(string jurisdiction, string detailedDescriptionText, string backgroundText, string abstractText, string summaryText, string drawingsIpfsFileHash);
+    
 
 	// properties
 	    // contribution and patent agent contracting phase
@@ -112,14 +119,19 @@ contract PatentHub is Host {
 	mapping(address => Patent) nationalizedPatentProposal; // maps nationalizers to localized patent proposals
 	
         // patent proposal/submission and third party to third party contracting phase
-	mapping(address => ThirdPartyThirdPartyContract) thirdPartyContracts;
+	mapping(address => ThirdPartyThirdPartyContract) translatorContracts;
+	address[] contractedTranslators;
+	mapping(address => address) translatorToNationalizer; // maps translator addresses to nationalizer addresses
+	mapping(address => ThirdPartyThirdPartyContract) patentOfficeReviews;
+	address[] reviewingPatentOffices;
+	mapping(address => address) patentOfficeToNationalizer; // maps patent office addresses to nationalizer addresses
 	
 	
 	
 	
 	// privacy modifiers
 	modifier onlyContractedPatentAgent() {
-	    require(patentAgentInventorsContract.signed && msg.sender == patentAgentInventorsContract.patentAgent);
+	    require(isContractedPatentAgent(msg.sender));
 	    _;
 	}
 	
@@ -129,13 +141,7 @@ contract PatentHub is Host {
 	}
 	
 	modifier onlyContractedNationalizer() {
-	    bool isContractedNationalizer = false;
-	    for (uint i = 0; i < contractedNationalizers.length; i++) {
-	        if (msg.sender == contractedNationalizers[i]) {
-	            isContractedNationalizer = true;
-	        }
-	    }
-	    require(isContractedNationalizer);
+	    require(isContractedNationalizer(msg.sender));
 	    _;
 	}
 	
@@ -145,21 +151,21 @@ contract PatentHub is Host {
 	    
 	    if (isRegisteredAsInventor(msg.sender)) {
 	        hasAccess = true;
-	    } else if (patentAgentInventorsContract.signed && msg.sender == patentAgentInventorsContract.patentAgent) {
+	    } else if (isContractedPatentAgent(msg.sender)) {
 	        hasAccess = true;
 	    } else if (contractedDrawer == msg.sender) {
 	        hasAccess = true;
-	    }
-	    for (uint i = 0; i < contractedNationalizers.length; i++) {
-	        if (msg.sender == contractedNationalizers[i]) {
-	            hasAccess = true;
-	        }
+	    } else if (isContractedNationalizer(msg.sender)) {
+	        hasAccess = true;
+	    } else if (isContractedTranslator(msg.sender)) {
+	        hasAccess = true;
+	    } else if (isReviewingPatentOffice(msg.sender)) {
+	        hasAccess = true;
 	    }
 	    
 	    require(hasAccess);
 		_;
-	}
-
+	}	
 
     // constructor
 	constructor() public {
@@ -297,12 +303,13 @@ contract PatentHub is Host {
 	                            patentDraft.drawingsIpfsFileHash);
 	}
 	
+	    // setters
 	function setPatentDraftJurisdiction(string memory jurisdiction) public onlyContractedPatentAgent() {
 	    patentDraft.jurisdiction = jurisdiction;
 	    emitPatentDraftUpdatedEvent();
 	}
 	
-	function setPatentDraftDetailedDescription(string memory detailedDescriptionText) public onlyContractedPatentAgent() {
+	function setPatentDraftDetailedDescriptionText(string memory detailedDescriptionText) public onlyContractedPatentAgent() {
 	    patentDraft.detailedDescriptionText = detailedDescriptionText;
 	    emitPatentDraftUpdatedEvent();
 	}
@@ -326,47 +333,103 @@ contract PatentHub is Host {
 	    patentDraft.drawingsIpfsFileHash = drawingsIpfsFileHash;
 	    emitPatentDraftUpdatedEvent();
 	}
+	    // getters
+	function getPatentDraftJurisdiction() public view onlyPartiesWithAccessToPatent() returns(string memory) {
+	    return patentDraft.jurisdiction;
+	}
 	
+	function getPatentDraftDetailedDescription() public view onlyPartiesWithAccessToPatent() returns(string memory) {
+	    return patentDraft.detailedDescriptionText;
+	}
+	
+	function getPatentDraftBackground() public view onlyPartiesWithAccessToPatent() returns(string memory) {
+	    return patentDraft.backgroundText;
+	}
+	
+	function getPatentDraftAbstract() public view onlyPartiesWithAccessToPatent() returns(string memory) {
+	    return patentDraft.abstractText;
+	}
+	
+	function getPatentDraftSummary() public view onlyPartiesWithAccessToPatent() returns(string memory) {
+	    return patentDraft.summaryText;
+	}
+	
+	function getPatentDraftDrawingsIpfsFileHash() public view onlyPartiesWithAccessToPatent() returns(string memory) {
+	    return patentDraft.drawingsIpfsFileHash;
+	}
 	
 	
 	// nationalizedPatentProposals
-	function emitNationalizedPatentProposalUpdatedEvent() internal {
-	    emit nationalizedPatentProposalUpdated(nationalizedPatentProposal[msg.sender].author,
-	                                           nationalizedPatentProposal[msg.sender].jurisdiction, 
-	                                           nationalizedPatentProposal[msg.sender].detailedDescriptionText, 
-	                                           nationalizedPatentProposal[msg.sender].backgroundText, 
-	                                           nationalizedPatentProposal[msg.sender].abstractText, 
-	                                           nationalizedPatentProposal[msg.sender].summaryText,
-	                                           nationalizedPatentProposal[msg.sender].drawingsIpfsFileHash);
+	function emitNationalizedPatentProposalUpdatedEvent(address nationalizer) internal {
+	    emit nationalizedPatentProposalUpdated(nationalizedPatentProposal[nationalizer].author,
+	                                           nationalizedPatentProposal[nationalizer].jurisdiction, 
+	                                           nationalizedPatentProposal[nationalizer].detailedDescriptionText, 
+	                                           nationalizedPatentProposal[nationalizer].backgroundText, 
+	                                           nationalizedPatentProposal[nationalizer].abstractText, 
+	                                           nationalizedPatentProposal[nationalizer].summaryText,
+	                                           nationalizedPatentProposal[nationalizer].drawingsIpfsFileHash);
 	}
 	
-	function setNationalizedPatentProposalJurisdiction(string memory jurisdiction) public onlyContractedPatentAgent() {
-	    nationalizedPatentProposal[msg.sender].jurisdiction = jurisdiction;
+	modifier onlyNationalizedPatentProposalEditors(address nationalizer) {
+	    require(msg.sender == nationalizer || translatorToNationalizer[msg.sender] == nationalizer);
+	    _;
+	}
+	    // setters
+	function setNationalizedPatentProposalJurisdiction(address nationalizer, string memory jurisdiction) public onlyNationalizedPatentProposalEditors(nationalizer) {
+	    nationalizedPatentProposal[nationalizer].jurisdiction = jurisdiction;
+	    emitNationalizedPatentProposalUpdatedEvent(nationalizer);
 	}
 	
-	function setNationalizedPatentProposalDetailedDescription(string memory detailedDescriptionText) public onlyContractedNationalizer() {
-	    nationalizedPatentProposal[msg.sender].detailedDescriptionText = detailedDescriptionText;
-        emitNationalizedPatentProposalUpdatedEvent();
+	function setNationalizedPatentProposalDetailedDescriptionText(address nationalizer, string memory detailedDescriptionText) public  onlyNationalizedPatentProposalEditors(nationalizer) {
+	    require(isRegisteredAsNationalizer(nationalizer));
+	    require(isContractedNationalizer(msg.sender) || isContractedTranslator(msg.sender));
+	    nationalizedPatentProposal[nationalizer].detailedDescriptionText = detailedDescriptionText;
+        emitNationalizedPatentProposalUpdatedEvent(nationalizer);
 	}
 	
-	function setNationalizedPatentProposalBackgroundText(string memory backgroundText) public onlyContractedPatentAgent() {
-	    nationalizedPatentProposal[msg.sender].backgroundText = backgroundText;
-        emitNationalizedPatentProposalUpdatedEvent();
+	function setNationalizedPatentProposalBackgroundText(address nationalizer, string memory backgroundText) public  onlyNationalizedPatentProposalEditors(nationalizer) {
+	    nationalizedPatentProposal[nationalizer].backgroundText = backgroundText;
+        emitNationalizedPatentProposalUpdatedEvent(nationalizer);
 	}
 	
-	function setNationalizedPatentProposalAbstractText(string memory abstractText) public onlyContractedPatentAgent() {
-	    nationalizedPatentProposal[msg.sender].abstractText = abstractText;
-        emitNationalizedPatentProposalUpdatedEvent();
+	function setNationalizedPatentProposalAbstractText(address nationalizer, string memory abstractText) public  onlyNationalizedPatentProposalEditors(nationalizer) {
+	    nationalizedPatentProposal[nationalizer].abstractText = abstractText;
+        emitNationalizedPatentProposalUpdatedEvent(nationalizer);
 	}
 	
-	function setNationalizedPatentProposalSummaryText(string memory summaryText) public onlyContractedPatentAgent() {
+	function setNationalizedPatentProposalSummaryText(address nationalizer, string memory summaryText) public  onlyNationalizedPatentProposalEditors(nationalizer) {
 	    patentDraft.summaryText = summaryText;
-        emitNationalizedPatentProposalUpdatedEvent();
+        emitNationalizedPatentProposalUpdatedEvent(nationalizer);
 	}
 	
-	function setNationalizedPatentProposalDrawingsIpfsFileHash(string memory drawingsIpfsFileHash) public onlyContractedDrawer() {
+	function setNationalizedPatentProposalDrawingsIpfsFileHash(address nationalizer, string memory drawingsIpfsFileHash) public  onlyNationalizedPatentProposalEditors(nationalizer) {
 	    patentDraft.drawingsIpfsFileHash = drawingsIpfsFileHash;
-        emitNationalizedPatentProposalUpdatedEvent();
+        emitNationalizedPatentProposalUpdatedEvent(nationalizer);
+	}
+	
+	    // getters
+	function getNationalizedPatentProposalJurisdiction(address nationalizer) public view onlyPartiesWithAccessToPatent() returns(string memory) {
+	    return nationalizedPatentProposal[nationalizer].jurisdiction;
+	}
+	
+	function getNationalizedPatentProposalDetailedDescription(address nationalizer) public view onlyPartiesWithAccessToPatent() returns(string memory) {
+	    return nationalizedPatentProposal[nationalizer].detailedDescriptionText;
+	}
+	
+	function getNationalizedPatentProposalBackground(address nationalizer) public view onlyPartiesWithAccessToPatent() returns(string memory) {
+	    return nationalizedPatentProposal[nationalizer].backgroundText;
+	}
+	
+	function getNationalizedPatentProposalAbstract(address nationalizer) public view onlyPartiesWithAccessToPatent() returns(string memory) {
+	    return nationalizedPatentProposal[nationalizer].abstractText;
+	}
+	
+	function getNationalizedPatentProposalSummary(address nationalizer) public view onlyPartiesWithAccessToPatent() returns(string memory) {
+	    return nationalizedPatentProposal[nationalizer].summaryText;
+	}
+	
+	function getNationalizedPatentProposalDrawingsIpfsFileHash(address nationalizer) public view onlyPartiesWithAccessToPatent() returns(string memory) {
+	    return nationalizedPatentProposal[nationalizer].drawingsIpfsFileHash;
 	}
 	
 	function uploadThirdPartyPatentAgentContract(string memory persona, uint payment, string memory ipfsFileHash) public {
@@ -393,12 +456,89 @@ contract PatentHub is Host {
 	    require(isRegisteredForPersona(msg.sender, persona));
 	    require(isRegisteredForPersona(approverAddress, approverPersona));
 	    
-	    thirdPartyContracts[approverAddress] = ThirdPartyThirdPartyContract(msg.sender, persona, approverAddress, approverPersona, ipfsFileHash, payment, false);
+	    ThirdPartyThirdPartyContract memory contr = ThirdPartyThirdPartyContract(msg.sender, persona, approverAddress, approverPersona, ipfsFileHash, payment, false);   
+	    
+	    if (compareStrings(persona, "translator")) {
+	        translatorContracts[approverAddress] = contr;
+	    } else  if (compareStrings(persona, "patentOffice")) {
+	        patentOfficeReviews[approverAddress] = contr;
+	    }
+	    
 	    emit approveContractRequest(msg.sender, persona, approverAddress, approverPersona, payment, ipfsFileHash);
 	}
 	
-	function approveThirdPartyThirdPartyContract(address proposingAddress) public onlyContractedPatentAgent() {
-		// WIP
+	function approveThirdPartyThirdPartyContract(address proposerAddress) public {
+	    ThirdPartyThirdPartyContract memory contr;
+	    if (translatorContracts[msg.sender].proposerAddress == proposerAddress) {
+	        contr = translatorContracts[msg.sender];
+	    } else if (patentOfficeReviews[msg.sender].proposerAddress == proposerAddress) {
+	        contr = patentOfficeReviews[msg.sender];
+	    } else {
+	        require(false);
+	    }
+	    
+	    contr.signed = true;
+	    
+	    string memory proposerPersona = contr.proposerPersona;
+	    string memory approverPersona = contr.approverPersona;
+	    
+	    if (compareStrings(approverPersona, "nationalizer")) {
+    	    if (compareStrings(proposerPersona, "translator")) {
+    	        contractedTranslators.push(proposerAddress);
+    	        translatorToNationalizer[proposerAddress] = msg.sender;
+    	        
+    	    } else if (compareStrings(proposerPersona, "patentOffice")) {
+    	        reviewingPatentOffices.push(proposerAddress);
+    	        patentOfficeToNationalizer[proposerAddress] = msg.sender;
+    	    }
+	    }
+	    
+	    emit contractApproved(proposerAddress, proposerPersona, msg.sender, approverPersona, contr.ipfsFileHash);
+	}
+	
+	function relatedNationalizerForTranslator() public view returns(address) {
+	    require(isContractedTranslator(msg.sender));
+	    return translatorToNationalizer[msg.sender];
+	}
+	
+	function relatedNationalizerForPatentOffice() public view returns(address) {
+	    require(isReviewingPatentOffice(msg.sender));
+	    return patentOfficeToNationalizer[msg.sender];
+	}
+	
+	// functions - helper functions specific to patent hub use case
+	function isContractedPatentAgent(address addr) internal view returns(bool) {
+        return patentAgentInventorsContract.signed && addr == patentAgentInventorsContract.patentAgent;
+    }
+    
+	function isContractedNationalizer(address addr) internal view returns(bool) {
+	    bool isContained = false;
+	    for (uint i = 0; i < contractedNationalizers.length; i++) {
+	        if (addr == contractedNationalizers[i]) {
+	            isContained = true;
+	        }
+	    }
+	    return isContained;
+	}
+	
+	function isContractedTranslator(address addr) internal view returns(bool) {
+	    bool isContained = false;
+	    for (uint i = 0; i < contractedTranslators.length; i++) {
+	        if (addr == contractedTranslators[i]) {
+	            isContained = true;
+	        }
+	    }
+	    return isContained;
+	}
+	
+	function isReviewingPatentOffice(address addr) internal view returns(bool) {
+	    bool isContained = false;
+	    for (uint i = 0; i < reviewingPatentOffices.length; i++) {
+	        if (addr == reviewingPatentOffices[i]) {
+	            isContained = true;
+	        }
+	    }
+	    return isContained;
 	}
 	
 	function isRegisteredForPersona(address addr, string memory persona) internal view returns(bool) {
@@ -412,5 +552,34 @@ contract PatentHub is Host {
 	        return isRegisteredAsPatentOffice(addr);
 	    }
 	    return false;
-	} 
+	}
+	
+	// functions - accepting patents and handling payments
+	
+    function acceptNationalPatent() public onlyPatentOffice() {
+        require(isReviewingPatentOffice(msg.sender));
+        
+        address nationalizer = patentOfficeToNationalizer[msg.sender];
+        nationalizedPatentProposal[nationalizer].acceptedByPatentOffice = true;
+        emit paymentRequest(nationalizer, msg.sender, patentOfficeReviews[nationalizer].payment);
+    }
+    
+    function payPatentOffice() public payable onlyContractedNationalizer() {
+        Patent memory patent = nationalizedPatentProposal[msg.sender];    
+        require(patent.acceptedByPatentOffice);
+        
+        address payable patentOffice = patentOfficeReviews[msg.sender].proposerAddress;
+        uint amount = patentOfficeReviews[msg.sender].payment;
+        
+        require(patentOffice.send(amount));
+        emit nationalPatentAccepted(patent.jurisdiction, patent.detailedDescriptionText, patent.backgroundText, patent.abstractText, patent.summaryText, patent.drawingsIpfsFileHash);
+    }
+    
+    function requestNationalizerPayment() public onlyContractedNationalizer() {
+        emit paymentRequest(patentAgent, msg.sender, patentOfficeReviews[nationalizer].payment);
+    }
+    
+    function payNationalizer(address payable nationalizer) public payable onlyPatentAgent() {
+        
+    }
 }
