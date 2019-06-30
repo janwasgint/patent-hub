@@ -398,6 +398,7 @@ contract PatentHub is Host {
 	}
 	
 	function approveThirdPartyThirdPartyContract(address proposingAddress) public onlyContractedPatentAgent() {
+		// WIP
 	}
 	
 	function isRegisteredForPersona(address addr, string memory persona) internal view returns(bool) {
