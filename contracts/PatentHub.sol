@@ -31,6 +31,7 @@ contract PatentHub is Host {
 	    string abstractText;
 	    string summaryText;
 	    string drawingsIpfsFileHash;
+	    bool acceptedByPatentOffice;
 	}
 	
 	struct ThirdPartyPatentAgentContract {
@@ -43,7 +44,7 @@ contract PatentHub is Host {
 	
 	    // third party to third party contacting phase
 	struct ThirdPartyThirdPartyContract {
-	    address proposerAddress;
+	    address payable proposerAddress;
 	    string proposerPersona; // 'translator' or 'patent office'
 	    address approverAddress;
 	    string approverPersona; // currently always 'nationalizer'
@@ -97,20 +98,11 @@ contract PatentHub is Host {
     
         // patent office submission and payment handling
             // when the process is completed and a settling of payments is requested
-    event paymentsRequested();
+    event paymentRequest(address indexed deptor, address indexed deptee, uint amount);
     
             // when all payments are settled
     event nationalPatentAccepted(string jurisdiction, string detailedDescriptionText, string backgroundText, string abstractText, string summaryText, string drawingsIpfsFileHash);
     
-    function acceptNationalPatent() public {
-        require(isReviewingPatentOffice(msg.sender));
-        
-        address nationalizer = patentOfficeToNationalizer[msg.sender];
-        
-        Patent memory patent = nationalizedPatentProposal[nationalizer];
-        
-        emit nationalPatentAccepted(patent.jurisdiction, patent.detailedDescriptionText, patent.backgroundText, patent.abstractText, patent.summaryText, patent.drawingsIpfsFileHash);
-    }
 
 	// properties
 	    // contribution and patent agent contracting phase
@@ -560,5 +552,34 @@ contract PatentHub is Host {
 	        return isRegisteredAsPatentOffice(addr);
 	    }
 	    return false;
-	} 
+	}
+	
+	// functions - accepting patents and handling payments
+	
+    function acceptNationalPatent() public onlyPatentOffice() {
+        require(isReviewingPatentOffice(msg.sender));
+        
+        address nationalizer = patentOfficeToNationalizer[msg.sender];
+        nationalizedPatentProposal[nationalizer].acceptedByPatentOffice = true;
+        emit paymentRequest(nationalizer, msg.sender, patentOfficeReviews[nationalizer].payment);
+    }
+    
+    function payPatentOffice() public payable onlyContractedNationalizer() {
+        Patent memory patent = nationalizedPatentProposal[msg.sender];    
+        require(patent.acceptedByPatentOffice);
+        
+        address payable patentOffice = patentOfficeReviews[msg.sender].proposerAddress;
+        uint amount = patentOfficeReviews[msg.sender].payment;
+        
+        require(patentOffice.send(amount));
+        emit nationalPatentAccepted(patent.jurisdiction, patent.detailedDescriptionText, patent.backgroundText, patent.abstractText, patent.summaryText, patent.drawingsIpfsFileHash);
+    }
+    
+    function requestNationalizerPayment() public onlyContractedNationalizer() {
+        emit paymentRequest(patentAgent, msg.sender, patentOfficeReviews[nationalizer].payment);
+    }
+    
+    function payNationalizer(address payable nationalizer) public payable onlyPatentAgent() {
+        
+    }
 }
