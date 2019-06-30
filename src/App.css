@@ -1,0 +1,160 @@
+/* PAGE */
+
+body,
+.pure-g [class*='pure-u'] {
+  font-family: 'Open Sans', sans-serif;
+}
+
+.header {
+  text-align: center;
+}
+
+h1,
+h2,
+h3 {
+  font-family: 'Oswald', 'Arial Narrow', sans-serif;
+}
+
+code {
+  padding: 0.25rem;
+  margin: 0 0.25rem;
+  background: #eee;
+}
+
+.container {
+  box-sizing: border-box;
+  width: calc(100% - 60px);
+  max-width: 600px;
+  padding: 45px 20px;
+  margin: 0 auto;
+}
+
+.pure-button-primary {
+  background-color: #0c1a2b;
+}
+
+.pure-button-primary:hover {
+  background-color: #233e5e;
+}
+
+.pure-form input[type='text']:focus {
+  border-color: #0c1a2b;
+}
+
+ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+ul li:not(:last-child) {
+  margin-bottom: 15px;
+}
+
+/* NAVBAR */
+
+.navbar {
+  position: fixed;
+  padding: 5px;
+  background: #0c1a2b;
+  font-family: 'Oswald', 'Arial Narrow', sans-serif;
+}
+
+.navbar a {
+  color: #fff;
+}
+
+.navbar a:active,
+.navbar a:focus,
+.navbar a:hover {
+  background: #233e5e;
+}
+
+.navbar .pure-menu-heading {
+  font-weight: bold;
+  text-transform: none;
+}
+
+.navbar .navbar-right {
+  float: right;
+}
+
+.navbar .uport-logo {
+  height: 16px;
+  margin-right: 10px;
+}
+
+/* LOADING SCREEN */
+
+.loading-screen {
+  opacity: 1;
+  visibility: visible;
+  transition: all 0.25s ease-in-out;
+}
+
+.loading-screen.loaded {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* FORMS */
+
+.pure-form {
+  display: inline-block;
+}
+
+/* ALERTS */
+/*
+.alert {
+  padding: 0.5rem;
+  color: darkgreen;
+  background: darkseagreen;
+  border: 1px solid darkgreen;
+}
+*/
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td,
+th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+
+.button {
+  background-color: #e7e7e7;
+  color: black; /* Gray */
+  border: none;
+  color: white;
+  -webkit-text-fill-color: #0c1a2b;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+
+.selectEmpl {
+  position: absolute;
+  top: 25%;
+  left: 34%;
+  width: 300px;
+  height: 150px;
+}
+
+.selectLan {
+  position: absolute;
+  top: 42%;
+  left: 34%;
+  width: 300px;
+  height: 150px;
+}
