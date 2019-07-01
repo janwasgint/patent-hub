@@ -10,9 +10,10 @@ ganache-cli -d -m "raven shock define wish brown cloth twin win weasel stable to
 
 ipfs daemon
 
-sh truffle-script.sh
+truffle compile
+truffle migrate
 
-Find the PatentHub deployment address in parse_PH_address and copy it to src/const.
+Find the PatentHub deployment address in the terminal output and copy it to src/const.
 
 npm (or yarn) start
 ```
