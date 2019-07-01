@@ -1,5 +1,6 @@
 # Patent Hub
 ```
+Make sure you have node version 0.8.16 (node -v)
 cd ethereum-private-network/truffle-code
 
 yarn install
