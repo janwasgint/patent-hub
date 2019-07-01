@@ -204,13 +204,6 @@ contract PatentHub is Host {
 	}
 
 	function getContributions(address inventor) public onlyPartiesWithAccessToPatent() view returns(string memory) {
-		bool hasAccess = false;
-		if (isRegisteredAsInventor(msg.sender)) {
-			hasAccess = true;
-		}
-
-		require(hasAccess);
-
 		string memory contributionsString = "";
 		string[] storage inventorsContributions = contributionFileHashes[inventor];
 
