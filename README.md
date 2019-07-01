@@ -2,9 +2,9 @@
 ```
 cd ethereum-private-network/truffle-code
 
-npm (or yarn) install
+yarn install
 
-npm (or yarn) install bootstrap
+yarn add bootstrap
 
 ganache-cli -d -m "raven shock define wish brown cloth twin win weasel stable tone share"
 
