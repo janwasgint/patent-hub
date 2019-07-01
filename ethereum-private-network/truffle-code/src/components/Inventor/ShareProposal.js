@@ -7,7 +7,7 @@ class ShareProposal extends Component {
   constructor(props) {
     super(props);
     this.showNewProposalForm = this.showNewProposalForm.bind(this);
-    this.cancelNewProposal = this.cancelNewProposal.bind(this);
+    this.hideNewProposalForm = this.hideNewProposalForm.bind(this);
     this.state = { showNewProposal: false };
   }
 
@@ -47,15 +47,17 @@ class ShareProposal extends Component {
     this.setState({ showNewProposal: true });
   }
 
-  cancelNewProposal() {
-    console.log("cancel2");
-
+  hideNewProposalForm() {
     this.setState({ showNewProposal: false });
   }
 
-  proposeNewShareDistribution() {
-    /*
+  proposeNewShareDistribution(inventors) {
+    console.log("new propsal");
+    console.log("inventorShares:", inventors);
+
     // read the values
+    /*
+
     // list of inventors addresses, list of shares
 
     const self = this;
@@ -114,8 +116,9 @@ class ShareProposal extends Component {
     if (showNewProposal) {
       form = (
         <SharesProposalForm
-          cancel={() => this.cancelNewProposal()}
-          propose={() => this.proposeNewShareDistribution()}
+          inventors={this.inventors}
+          hide={() => this.hideNewProposalForm()}
+          propose={this.proposeNewShareDistribution}
         />
       );
     }
