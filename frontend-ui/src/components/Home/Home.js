@@ -1,5 +1,9 @@
-import React, { Component } from "react";
-import { AccountData } from "drizzle-react-components";
+import React, {
+  Component
+} from "react";
+import {
+  AccountData
+} from "drizzle-react-components";
 import PropTypes from "prop-types";
 import Blockies from "react-blockies";
 
@@ -8,6 +12,9 @@ import ShareProposal from "../Inventor/ShareProposal";
 
 //Patent Agent
 import PatentAgentUI from "../PatentAgent/PatentAgentUI";
+
+//Drawer
+import DrawerUI from "../Drawer/DrawerUI";
 
 //import VerifyDataContainer from '../VerifyData/VerifyDataContainer';
 //import EventsContainer from '../Events/EventsContainer';
@@ -24,31 +31,45 @@ class Home extends Component {
     var hostDataKey = this.context.drizzle.contracts["PatentHub"].methods[
       "host"
     ].cacheCall();
-    this.setState({ hostDataKey: hostDataKey });
+    this.setState({
+      hostDataKey: hostDataKey
+    });
     var inventorDataKey = this.context.drizzle.contracts["PatentHub"].methods[
       "isRegisteredAsInventor"
     ].cacheCall(this.props.accounts[0]);
-    this.setState({ inventorDataKey: inventorDataKey });
+    this.setState({
+      inventorDataKey: inventorDataKey
+    });
     var patentAgentDataKey = this.context.drizzle.contracts[
       "PatentHub"
     ].methods["isRegisteredAsPatentAgent"].cacheCall(this.props.accounts[0]);
-    this.setState({ patentAgentDataKey: patentAgentDataKey });
+    this.setState({
+      patentAgentDataKey: patentAgentDataKey
+    });
     var drawerDataKey = this.context.drizzle.contracts["PatentHub"].methods[
       "isRegisteredAsDrawer"
     ].cacheCall(this.props.accounts[0]);
-    this.setState({ drawerDataKey: drawerDataKey });
+    this.setState({
+      drawerDataKey: drawerDataKey
+    });
     var nationalizerDataKey = this.context.drizzle.contracts[
       "PatentHub"
     ].methods["isRegisteredAsNationalizer"].cacheCall(this.props.accounts[0]);
-    this.setState({ nationalizerDataKey: nationalizerDataKey });
+    this.setState({
+      nationalizerDataKey: nationalizerDataKey
+    });
     var translatorDataKey = this.context.drizzle.contracts["PatentHub"].methods[
       "isRegisteredAsTranslator"
     ].cacheCall(this.props.accounts[0]);
-    this.setState({ translatorDataKey: translatorDataKey });
+    this.setState({
+      translatorDataKey: translatorDataKey
+    });
     var patentOfficeDataKey = this.context.drizzle.contracts[
       "PatentHub"
     ].methods["isRegisteredAsPatentOffice"].cacheCall(this.props.accounts[0]);
-    this.setState({ patentOfficeDataKey: patentOfficeDataKey });
+    this.setState({
+      patentOfficeDataKey: patentOfficeDataKey
+    });
   }
 
   componentWillReceiveProps() {
@@ -125,96 +146,149 @@ class Home extends Component {
       role = "PatentOffice";
     }
 
-    this.setState({ role: role });
+    this.setState({
+      role: role
+    });
   }
 
   render() {
     if (this.state.role === undefined) {
-      return <span>Loading...</span>;
+      return <span > Loading... < /span>;
     }
 
     var myAddr = this.props.accounts[0];
     let role = this.state.role;
     let self = this;
 
-    return (
-      <main className="container">
-        <div className="pure-g">
-          <div className="pure-u-1-1 header">
-            <div className="jumbotron">
-              <h1 className="display-4">Patent Hub</h1>
+    return ( <
+        main className = "container" >
+        <
+        div className = "pure-g" >
+        <
+        div className = "pure-u-1-1 header" >
+        <
+        div className = "jumbotron" >
+        <
+        h1 className = "display-4" > Patent Hub < /h1>
 
-              <hr className="my-4" />
-              <p className="lead">
-                <Blockies seed={myAddr} size={10} scale={10} />
-              </p>
-              <p>
-                <AccountData accountIndex="0" units="ether" precision="3" />
-              </p>
-            </div>
-          </div>
+        <
+        hr className = "my-4" / >
+        <
+        p className = "lead" >
+        <
+        Blockies seed = {
+          myAddr
+        }
+        size = {
+          10
+        }
+        scale = {
+          10
+        }
+        /> < /
+        p > <
+        p >
+        <
+        AccountData accountIndex = "0"
+        units = "ether"
+        precision = "3" / >
+        <
+        /p> < /
+        div > <
+        /div>
 
-          <div className="pure-u-1-1">
-            <h2>Contract actions</h2>
-            {this.state.role === "Host" && (
-              <div>
-                <p>
-                  <strong>Register Actor</strong>:
-                </p>
-                <HostSelect />
-              </div>
-            )}
-            {this.state.role === "Unregistered" && (
-              <div>
-                <p>
-                  <strong>I am not registered!</strong>
-                </p>
-              </div>
-            )}
-            {this.state.role === "Inventor" && (
-              <div>
-                <ShareProposal />
-              </div>
-            )}
-            {this.state.role === "PatentAgent" && (
-              <div>
-                <PatentAgentUI />
-              </div>
-            )}
-            {/*{role === 'Landlord' && (
-              <div>
-               <p>
-                  <strong>Verify Data as a Landlord</strong>:
-                </p>
-                <VerifyDataContainer />
-              </div>
-            )}
-            {role === 'Landlord' && (
-              <div>
-                <p>
-                  <strong>Upload Contract</strong>:
-                </p>
-                <UploadContractContainer />
-              </div>
-            )}*/}
+        <
+        div className = "pure-u-1-1" >
+        <
+        h2 > Contract actions < /h2> {
+        this.state.role === "Host" && ( <
+          div >
+          <
+          p >
+          <
+          strong > Register Actor < /strong>: < /
+          p > <
+          HostSelect / >
+          <
+          /div>
+        )
+      } {
+        this.state.role === "Unregistered" && ( <
+          div >
+          <
+          p >
+          <
+          strong > I am not registered! < /strong> <
+          /p > < /
+          div >
+        )
+      } {
+        this.state.role === "Inventor" && ( <
+          div >
+          <
+          ShareProposal / >
+          <
+          /div>
+        )
+      } {
+        this.state.role === "PatentAgent" && ( <
+          div >
+          <
+          PatentAgentUI / >
+          <
+          /div>
+        )
+      } {
+        this.state.role === "Drawer" && ( <
+          div >
+          <
+          DrawerUI / >
+          <
+          /div>
+        )
+      } {
+        /*{role === 'Landlord' && (
+                      <div>
+                       <p>
+                          <strong>Verify Data as a Landlord</strong>:
+                        </p>
+                        <VerifyDataContainer />
+                      </div>
+                    )}
+                    {role === 'Landlord' && (
+                      <div>
+                        <p>
+                          <strong>Upload Contract</strong>:
+                        </p>
+                        <UploadContractContainer />
+                      </div>
+                    )}*/
+      }
 
-            <br />
-            <br />
-          </div>
+      <
+      br / >
+      <
+      br / >
+      <
+      /div>
 
-          <div className="pure-u-1-1">
-            {role === "Host" && <h2>Events</h2>}
-            {/*{role === 'Employer' && <h2>Events</h2>}
-            {role === 'Employee' && <h2>Data Requests</h2>}
-            {role === 'Landlord' && <h2>Data Approvals</h2>}
-            <EventsContainer role={role} />*/}
-            <br />
-            <br />
-          </div>
-        </div>
-      </main>
-    );
-  }
+      <
+      div className = "pure-u-1-1" > {
+        role === "Host" && < h2 > Events < /h2>} {
+        /*{role === 'Employer' && <h2>Events</h2>}
+                    {role === 'Employee' && <h2>Data Requests</h2>}
+                    {role === 'Landlord' && <h2>Data Approvals</h2>}
+                    <EventsContainer role={role} />*/
+      } <
+      br / >
+      <
+      br / >
+      <
+      /div> < /
+    div > <
+      /main>
+  );
+}
 }
 
 Home.contextTypes = {
