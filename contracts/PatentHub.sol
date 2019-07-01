@@ -34,20 +34,12 @@ contract PatentHub is Host {
 	    bool acceptedByPatentOffice;
 	}
 	
-	struct ThirdPartyPatentAgentContract {
-	    address thirdPartyAddress;
-	    string thirdPartyPersona; // 'drawer' or 'nationalizer'
-	    string ipfsFileHash;
-	    uint payment;
-	    bool signed;
-	}
-	
-	    // third party to third party contacting phase
-	struct ThirdPartyThirdPartyContract {
+	    // contracts between two single parties
+	struct OneToOneContract {
 	    address payable proposerAddress;
-	    string proposerPersona; // 'translator' or 'patent office'
+	    string proposerPersona; // 'drawer', 'nationalizer', 'translator' or 'patent office'
 	    address approverAddress;
-	    string approverPersona; // currently always 'nationalizer'
+	    string approverPersona; // 'patentAgent' or 'nationalizer'
 	    string ipfsFileHash;
 	    uint payment;
 	    bool signed;
@@ -82,13 +74,6 @@ contract PatentHub is Host {
             // when any nationalized patent proposal is updated
     event nationalizedPatentProposalUpdated(address indexed nationalizer, string jurisdiction, string detailedDescriptionText, string backgroundText, string abstractText, string summaryText, string drawingsIpfsFileHash);
     
-            // when the patent agent needs to approve a third party contracting
-    event approveThirdPartyPatentAgentContractRequest(address indexed thirdPartyAddress, string thirdPartyPersona, uint payment, string ipfsFileHash);
-    
-            // when a third party contract was approved
-    event thirdPartyPatentAgentContractApproved(address indexed thirdPartyAddress, string thirdPartyPersona, string ipfsFileHash);
-    
-    
         // third party to third party contacting phase
             // when a third party proposes a contract
     event approveContractRequest(address indexed proposerAddress, string proposerPersona, address indexed approverAddress, string approverPersona, uint payment, string ipfsFileHash);
@@ -113,16 +98,18 @@ contract PatentHub is Host {
 	
 	    // patent drafting and third party contracting phase
 	Patent patentDraft;
-	mapping(address => ThirdPartyPatentAgentContract) thirdPartyPatentAgentContracts; // maps third party to contract
+	OneToOneContract drawerContract; // maps third party to contract
 	address contractedDrawer;
+	
+	OneToOneContract[] nationalizerContracts;
 	address[] contractedNationalizers;
 	mapping(address => Patent) nationalizedPatentProposal; // maps nationalizers to localized patent proposals
 	
         // patent proposal/submission and third party to third party contracting phase
-	mapping(address => ThirdPartyThirdPartyContract) translatorContracts;
+	mapping(address => OneToOneContract) translatorContracts;
 	address[] contractedTranslators;
 	mapping(address => address) translatorToNationalizer; // maps translator addresses to nationalizer addresses
-	mapping(address => ThirdPartyThirdPartyContract) patentOfficeReviews;
+	mapping(address => OneToOneContract) patentOfficeReviews;
 	address[] reviewingPatentOffices;
 	mapping(address => address) patentOfficeToNationalizer; // maps patent office addresses to nationalizer addresses
 	
@@ -432,68 +419,60 @@ contract PatentHub is Host {
 	    return nationalizedPatentProposal[nationalizer].drawingsIpfsFileHash;
 	}
 	
-	function uploadThirdPartyPatentAgentContract(string memory persona, uint payment, string memory ipfsFileHash) public {
-	    require(isRegisteredForPersona(msg.sender, persona));
-	    
-	    thirdPartyPatentAgentContracts[msg.sender] = ThirdPartyPatentAgentContract(msg.sender, persona, ipfsFileHash, payment, false);
-	    emit approveThirdPartyPatentAgentContractRequest(msg.sender, persona, payment, ipfsFileHash);
-	}
-	
-	function approveThirdPartyPatentAgentContract(address thirdPartyAddress) public onlyContractedPatentAgent() {
-        thirdPartyPatentAgentContracts[thirdPartyAddress].signed = true;
-        string memory persona = thirdPartyPatentAgentContracts[thirdPartyAddress].thirdPartyPersona;
-        if (compareStrings(persona, "drawer")) {
-            contractedDrawer = thirdPartyAddress;
-        } else if (compareStrings(persona, "nationalizer")) {
-            nationalizedPatentProposal[thirdPartyAddress].author = thirdPartyAddress;
-            contractedNationalizers.push(thirdPartyAddress);
-        }
-        emit thirdPartyPatentAgentContractApproved(thirdPartyAddress, persona, thirdPartyPatentAgentContracts[thirdPartyAddress].ipfsFileHash);
-	}
-	
-	// functions - patent proposal/submission and third party to third party contracting phase
-	function uploadThirdPartyThirdPartyContract(string memory persona, address approverAddress, string memory approverPersona, uint payment, string memory ipfsFileHash) public {
+	// functions - patent proposal/submission and contracting phase
+	function uploadContract(string memory persona, address approverAddress, string memory approverPersona, uint payment, string memory ipfsFileHash) public {
 	    require(isRegisteredForPersona(msg.sender, persona));
 	    require(isRegisteredForPersona(approverAddress, approverPersona));
 	    
-	    ThirdPartyThirdPartyContract memory contr = ThirdPartyThirdPartyContract(msg.sender, persona, approverAddress, approverPersona, ipfsFileHash, payment, false);   
+	    OneToOneContract memory contr = OneToOneContract(msg.sender, persona, approverAddress, approverPersona, ipfsFileHash, payment, false);   
 	    
-	    if (compareStrings(persona, "translator")) {
+	    if (compareStrings(persona, "drawer")) {
+	        drawerContract = contr;
+	    } else if (compareStrings(persona, "nationalizer")) {
+	        nationalizerContracts.push(contr);
+	    } else if (compareStrings(persona, "translator")) {
 	        translatorContracts[approverAddress] = contr;
-	    } else  if (compareStrings(persona, "patentOffice")) {
+	    } else if (compareStrings(persona, "patentOffice")) {
 	        patentOfficeReviews[approverAddress] = contr;
 	    }
 	    
 	    emit approveContractRequest(msg.sender, persona, approverAddress, approverPersona, payment, ipfsFileHash);
 	}
 	
-	function approveThirdPartyThirdPartyContract(address proposerAddress) public {
-	    ThirdPartyThirdPartyContract memory contr;
-	    if (translatorContracts[msg.sender].proposerAddress == proposerAddress) {
-	        contr = translatorContracts[msg.sender];
-	    } else if (patentOfficeReviews[msg.sender].proposerAddress == proposerAddress) {
-	        contr = patentOfficeReviews[msg.sender];
-	    } else {
-	        require(false);
+	function approveContract(address proposerAddress) public {
+	    OneToOneContract memory contr;
+	    
+	    bool nationalizerContractSigned = false;
+	    for (uint i = 0; i < nationalizerContracts.length; i++) {
+	        if (nationalizerContracts[i].proposerAddress == proposerAddress) {
+	            nationalizerContracts[i].signed = true;
+	            contractedNationalizers.push(proposerAddress);
+	            contr = nationalizerContracts[i];
+	            nationalizerContractSigned = true;
+	        }
 	    }
 	    
-	    contr.signed = true;
-	    
-	    string memory proposerPersona = contr.proposerPersona;
-	    string memory approverPersona = contr.approverPersona;
-	    
-	    if (compareStrings(approverPersona, "nationalizer")) {
-    	    if (compareStrings(proposerPersona, "translator")) {
+	    if (nationalizerContractSigned == false) {
+	        if (drawerContract.proposerAddress == proposerAddress) {
+    	        drawerContract.signed = true;
+    	        contractedDrawer = proposerAddress;
+    	        contr = drawerContract;
+    	    } else if (translatorContracts[msg.sender].proposerAddress == proposerAddress) {
+    	        translatorContracts[msg.sender].signed = true;
     	        contractedTranslators.push(proposerAddress);
     	        translatorToNationalizer[proposerAddress] = msg.sender;
-    	        
-    	    } else if (compareStrings(proposerPersona, "patentOffice")) {
+    	        contr = translatorContracts[msg.sender];
+    	    } else if (patentOfficeReviews[msg.sender].proposerAddress == proposerAddress) {
+    	        patentOfficeReviews[msg.sender].signed = true;
     	        reviewingPatentOffices.push(proposerAddress);
     	        patentOfficeToNationalizer[proposerAddress] = msg.sender;
-    	    }
+    	        contr = patentOfficeReviews[msg.sender];
+    	    } else {
+    	        require(false);
+    	    }    
 	    }
 	    
-	    emit contractApproved(proposerAddress, proposerPersona, msg.sender, approverPersona, contr.ipfsFileHash);
+	    emit contractApproved(proposerAddress, contr.proposerPersona, msg.sender, contr.approverPersona, contr.ipfsFileHash);
 	}
 	
 	function relatedNationalizerForTranslator() public view returns(address) {
@@ -550,6 +529,8 @@ contract PatentHub is Host {
 	        return isRegisteredAsTranslator(addr);
 	    } else if (compareStrings(persona, "patentOffice")) {
 	        return isRegisteredAsPatentOffice(addr);
+	    } else if (compareStrings(persona, "patentAgent")) {
+	        return isRegisteredAsPatentAgent(addr);
 	    }
 	    return false;
 	}
@@ -573,13 +554,5 @@ contract PatentHub is Host {
         
         require(patentOffice.send(amount));
         emit nationalPatentAccepted(patent.jurisdiction, patent.detailedDescriptionText, patent.backgroundText, patent.abstractText, patent.summaryText, patent.drawingsIpfsFileHash);
-    }
-    
-    function requestNationalizerPayment() public onlyContractedNationalizer() {
-        emit paymentRequest(patentAgent, msg.sender, patentOfficeReviews[nationalizer].payment);
-    }
-    
-    function payNationalizer(address payable nationalizer) public payable onlyPatentAgent() {
-        
     }
 }
