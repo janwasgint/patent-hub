@@ -1,0 +1,10 @@
+node_modules/
+build/
+build_webpack/
+src/contracts/
+bash.exe.stackdump
+.project
+*.log
+src/public/contracts/
+src/const.js
+.idea
