@@ -30,6 +30,11 @@ contract Host is Helper {
 		require (isRegisteredAsPatentAgent(patentAgent));
 		_;
 	}
+	
+	modifier onlyPatentOffice(address patentOffice) {
+	    require (isRegisteredAsPatentOffice(patentOffice));
+	    _;
+	}
 
     modifier only3rdParty(address actor) {
     	require (
