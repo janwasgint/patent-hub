@@ -8,6 +8,9 @@ npm (or yarn) install bootstrap
 
 ganache-cli -d -m "raven shock define wish brown cloth twin win weasel stable tone share"
 
+If this is your first time running ipfs:
+ipfs init
+
 ipfs daemon
 
 truffle compile
