@@ -17,6 +17,12 @@ class ShareProposal extends Component {
     "progress-bar"
   ];
 
+  inventors = [
+    ["Jan", "0x5764e7337dfae66f5ac5551ebb77307709fb0219"],
+    ["Luca", "0x11c2e86ebecf701c265f6d19036ec90d277dd2b3"],
+    ["Korbi", "0xc33a1d62e6de00d4c9b135718280411101bcb9dd"]
+  ];
+
   testSharesProposal = [["A", "33%"], ["InventorXYZ", "50%"], ["D", "17%"]];
 
   componentDidMount() {}
@@ -48,12 +54,12 @@ class ShareProposal extends Component {
   }
 
   proposeNewShareDistribution() {
-  /*
+    /*
     // read the values
     // list of inventors addresses, list of shares
 
     const self = this;
-  
+
     var account = '';
     this.context.drizzle.web3.eth.getAccounts(function(error, result) {
       if (error != null) console.log("Could not get accounts!");
@@ -75,8 +81,7 @@ class ShareProposal extends Component {
       .catch(function(err) {
         console.log(err.message);
       });*/
-  };
-
+  }
 
   createSharesBar() {
     let shares = [];
@@ -206,12 +211,11 @@ class ShareProposal extends Component {
 
         <div className="card">
           <h5 className="card-header">Files for Patent Agent</h5>
-              <div>
-                <AddContributionContainer />
-              </div>
-          {/*<div className="card-body">
+          <div className="card-body">
+            <AddContributionContainer />
+            {/*
             <form>
-              <div className="form-group">
+
                 <input
                   type="file"
                   className="form-control-file"
@@ -225,9 +229,10 @@ class ShareProposal extends Component {
                 >
                   Send
                 </button>
-              </div>
+
             </form>
-          </div>*/}
+          */}
+          </div>
         </div>
       </div>
     );
