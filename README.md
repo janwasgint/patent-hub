@@ -16,4 +16,6 @@ truffle migrate
 Find the PatentHub deployment address in the terminal output and copy it to src/const.
 
 npm (or yarn) start
+
+In Metamask -> Settings -> Security & Privacy -> untoggle privacy mode
 ```
