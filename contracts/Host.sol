@@ -21,18 +21,18 @@ contract Host is Helper {
 		_;
 	}
 
-	modifier onlyInventor(address inventor) {
-		require (isRegisteredAsInventor(inventor));
+	modifier onlyInventor() {
+		require (isRegisteredAsInventor(msg.sender));
 		_;
 	}
 
-	modifier onlyPatentAgent(address patentAgent) {
-		require (isRegisteredAsPatentAgent(patentAgent));
+	modifier onlyPatentAgent() {
+		require (isRegisteredAsPatentAgent(msg.sender));
 		_;
 	}
 	
-	modifier onlyPatentOffice(address patentOffice) {
-	    require (isRegisteredAsPatentOffice(patentOffice));
+	modifier onlyPatentOffice() {
+	    require (isRegisteredAsPatentOffice(msg.sender));
 	    _;
 	}
 
