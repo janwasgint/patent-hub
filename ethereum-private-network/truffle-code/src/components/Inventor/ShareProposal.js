@@ -52,10 +52,9 @@ class ShareProposal extends Component {
   }
 
   proposeNewShareDistribution(inventors) {
-    console.log("new propsal");
+    // Inventors is an array of [Name, Address, Proposed Share]
     console.log("inventorShares:", inventors);
 
-    // read the values
     /*
 
     // list of inventors addresses, list of shares
