@@ -1,26 +1,26 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import Blockies from 'react-blockies';
+import Blockies from "react-blockies";
 import SharesProposalForm from "./SharesProposalForm";
 import AddContributionContainer from "./AddContribution/AddContributionContainer";
 
-const ipfsAPI = require('ipfs-api');
-const pdfjsLib = require('pdfjs-dist');
+const ipfsAPI = require("ipfs-api");
+const pdfjsLib = require("pdfjs-dist");
 
 class ShareProposal extends Component {
   constructor(props) {
     super(props);
 
-    this.ipfsApi = ipfsAPI('localhost', 5001, 'https');
+    this.ipfsApi = ipfsAPI("localhost", 5001, "https");
 
     this.showNewProposalForm = this.showNewProposalForm.bind(this);
-    this.cancelNewProposal = this.cancelNewProposal.bind(this);
+    this.hideNewProposalForm = this.hideNewProposalForm.bind(this);
     this.downloadPdf = this.downloadPdf.bind(this);
     this.state = { showNewProposal: false };
 
     // local copy of the events we are interested in
     this.events = {
-      contributionAddedSuccessfully: [],
+      contributionAddedSuccessfully: []
     };
 
     // fetch all events we have to listen to from the contract
@@ -28,10 +28,11 @@ class ShareProposal extends Component {
     // iterate all events to get the one we are interested in - contributionAddedSuccessfully(address indexed inventor, string ipfsFileHash)
     // for events parameteres see PatentHub.sol
     for (var i = 0; i < propsEvents.length; i++) {
-      if (propsEvents[i].event === 'contributionAddedSuccessfully') {// && propsEvents[i].returnValues.landlord === props.accounts[0]) {
+      if (propsEvents[i].event === "contributionAddedSuccessfully") {
+        // && propsEvents[i].returnValues.landlord === props.accounts[0]) {
         this.events.contributionAddedSuccessfully.push({
           inventor: propsEvents[i].returnValues.inventor,
-          ipfsFileHash: propsEvents[i].returnValues.ipfsFileHash,
+          ipfsFileHash: propsEvents[i].returnValues.ipfsFileHash
         });
       }
     }
@@ -42,6 +43,12 @@ class ShareProposal extends Component {
     "progress-bar bg-warning",
     "progress-bar bg-info",
     "progress-bar"
+  ];
+
+  inventors = [
+    ["Jan", "0x5764e7337dfae66f5ac5551ebb77307709fb0219"],
+    ["Luca", "0x11c2e86ebecf701c265f6d19036ec90d277dd2b3"],
+    ["Korbi", "0xc33a1d62e6de00d4c9b135718280411101bcb9dd"]
   ];
 
   testSharesProposal = [["A", "33%"], ["InventorXYZ", "50%"], ["D", "17%"]];
@@ -68,19 +75,20 @@ class ShareProposal extends Component {
     this.setState({ showNewProposal: true });
   }
 
-  cancelNewProposal() {
-    console.log("cancel2");
-
+  hideNewProposalForm() {
     this.setState({ showNewProposal: false });
   }
 
-  proposeNewShareDistribution() {
-  /*
-    // read the values
+  proposeNewShareDistribution(inventors) {
+    // Inventors is an array of [Name, Address, Proposed Share]
+    console.log("inventorShares:", inventors);
+
+    /*
+
     // list of inventors addresses, list of shares
 
     const self = this;
-  
+
     var account = '';
     this.context.drizzle.web3.eth.getAccounts(function(error, result) {
       if (error != null) console.log("Could not get accounts!");
@@ -102,11 +110,7 @@ class ShareProposal extends Component {
       .catch(function(err) {
         console.log(err.message);
       });*/
-  };
-
-
-
-
+  }
 
   createSharesBar() {
     let shares = [];
@@ -133,12 +137,12 @@ class ShareProposal extends Component {
   }
 
   downloadPdf(ipfsFileHash) {
-    this.ipfsApi.get(ipfsFileHash, function (err, files) {
-      files.forEach((file) => {
-        console.log(file.path)
-        console.log(file.content.toString('utf8'))
-      })
-    })
+    this.ipfsApi.get(ipfsFileHash, function(err, files) {
+      files.forEach(file => {
+        console.log(file.path);
+        console.log(file.content.toString("utf8"));
+      });
+    });
   }
 
   render() {
@@ -149,8 +153,9 @@ class ShareProposal extends Component {
     if (showNewProposal) {
       form = (
         <SharesProposalForm
-          cancel={() => this.cancelNewProposal()}
-          propose={() => this.proposeNewShareDistribution()}
+          inventors={this.inventors}
+          hide={() => this.hideNewProposalForm()}
+          propose={this.proposeNewShareDistribution}
         />
       );
     }
@@ -246,12 +251,12 @@ class ShareProposal extends Component {
 
         <div className="card">
           <h5 className="card-header">Upload Contribution</h5>
-              <div>
-                <AddContributionContainer />
-              </div>
-          {/*<div className="card-body">
+          <div>
+            <AddContributionContainer />
+          </div>
+          {/*
             <form>
-              <div className="form-group">
+
                 <input
                   type="file"
                   className="form-control-file"
@@ -267,11 +272,10 @@ class ShareProposal extends Component {
                 </button>
               </div>
             </form>*/}
-         </div>
 
-          <p />   
-      
-        <div className="card">
+          <p />
+
+          <div className="card">
             <h5 className="card-header">Contribution List</h5>
             <table>
               <thead>
@@ -280,26 +284,32 @@ class ShareProposal extends Component {
                   <th>File hash</th>
                 </tr>
               </thead>
-              {this.events.contributionAddedSuccessfully.map(function(event, i) {
-                  return (
-                    <tbody key={i}>
-                      <tr>
-                        <td>
-                          <Blockies seed={event.inventor} size={10} scale={10} />
-                          {event.inventor}
-                        </td>
-                        <td>{event.ipfsFileHash}</td>
-                        <td>
-                        <button className="form-control btn btn-primary" /*onClick={self.downloadPdf(event.ipfsFileHash)}*/>
+              {this.events.contributionAddedSuccessfully.map(function(
+                event,
+                i
+              ) {
+                return (
+                  <tbody key={i}>
+                    <tr>
+                      <td>
+                        <Blockies seed={event.inventor} size={10} scale={10} />
+                        {event.inventor}
+                      </td>
+                      <td>{event.ipfsFileHash}</td>
+                      <td>
+                        <button
+                          className="form-control btn btn-primary" /*onClick={self.downloadPdf(event.ipfsFileHash)}*/
+                        >
                           Download
                         </button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  );
-                })}
-             </table>
+                      </td>
+                    </tr>
+                  </tbody>
+                );
+              })}
+            </table>
           </div>
+        </div>
       </div>
     );
   }
