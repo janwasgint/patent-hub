@@ -17,7 +17,5 @@ ipfs daemon
 truffle compile
 truffle migrate
 
-Find the PatentHub deployment address in the terminal output and copy it to src/const.
-
 npm (or yarn) start
 ```
