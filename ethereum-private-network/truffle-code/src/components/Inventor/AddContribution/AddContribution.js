@@ -18,7 +18,6 @@ class AddContribution extends Component {
     // bind methods
     this.captureFile = this.captureFile.bind(this);
     this.saveToIpfs = this.saveToIpfs.bind(this);
-    this.downloadPdf = this.downloadPdf.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
   }
@@ -50,15 +49,6 @@ class AddContribution extends Component {
       .catch((err) => {
         console.error(err);
       });
-  }
-
-  downloadPdf() {
-    this.ipfsApi.get(this.state.added_file_hash, function (err, files) {
-      files.forEach((file) => {
-        console.log(file.path)
-        console.log(file.content.toString('utf8'))
-      })
-    })
   }
 
   onClick = (e) => {
@@ -104,11 +94,6 @@ class AddContribution extends Component {
         <canvas width="2" height="2" id="the-canvas2" />
         <br />
         <br />
-        <div className="row">
-          <button className="form-control btn btn-primary" onClick={this.downloadPdf}>
-            Download
-          </button>
-        </div>
       </div>
     );
   }

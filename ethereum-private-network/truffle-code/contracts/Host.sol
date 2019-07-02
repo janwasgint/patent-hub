@@ -47,32 +47,45 @@ contract Host is Helper {
     	_;
     }
 
+
+    // events
+        // setup phase
+	            // when a participant is registered by the host
+    event participantRegistered(address indexed participant, string role);
+
+
 	/// functions for registering 3rd parties
 	function registerInventor(address inventor) public onlyHost {
 	    if (inventors[inventor] == false) {
 	        allInventors.push(inventor);
 	    }
-		inventors[inventor] = true;	
+		inventors[inventor] = true;
+        emit participantRegistered(inventor, "Inventor");
 	}
 
 	function registerPatentAgent(address patentAgent) public onlyHost {
 		patentAgents[patentAgent] = true;
+        emit participantRegistered(patentAgent, "Patent Agent");
 	}
 
 	function registerDrawer(address drawer) public onlyHost {
 		drawers[drawer] = true;
+        emit participantRegistered(drawer, "Drawer");
 	}
 
 	function registerNationalizer(address nationalizer) public onlyHost {
 		nationalizers[nationalizer] = true;
+        emit participantRegistered(nationalizer, "Nationalizer");
 	}
 
     function registerTranslator(address translator) public onlyHost {
 		translators[translator] = true;
-	}
+        emit participantRegistered(translator, "Translator");
+    }
 
-	function registerPatentOffices(address patentOffice) public onlyHost {
+	function registerPatentOffice(address patentOffice) public onlyHost {
 		patentOffices[patentOffice] = true;
+        emit participantRegistered(patentOffice, "Patent Office");
 	}
 
 	/// functions for checking registrations of 3rd parties

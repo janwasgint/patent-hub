@@ -1,14 +1,41 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+import Blockies from 'react-blockies';
 import SharesProposalForm from "./SharesProposalForm";
 import AddContributionContainer from "./AddContribution/AddContributionContainer";
+
+const ipfsAPI = require('ipfs-api');
+const pdfjsLib = require('pdfjs-dist');
 
 class ShareProposal extends Component {
   constructor(props) {
     super(props);
+
+    this.ipfsApi = ipfsAPI('localhost', 5001, 'https');
+
     this.showNewProposalForm = this.showNewProposalForm.bind(this);
     this.cancelNewProposal = this.cancelNewProposal.bind(this);
+    this.downloadPdf = this.downloadPdf.bind(this);
     this.state = { showNewProposal: false };
+
+    // local copy of the events we are interested in
+    this.events = {
+      contributionAddedSuccessfully: [],
+    };
+
+    // fetch all events we have to listen to from the contract
+    let propsEvents = this.props.PatentHub.events;
+    // iterate all events to get the one we are interested in - contributionAddedSuccessfully(address indexed inventor, string ipfsFileHash)
+    // for events parameteres see PatentHub.sol
+    for (var i = 0; i < propsEvents.length; i++) {
+      if (propsEvents[i].event === 'contributionAddedSuccessfully') {// && propsEvents[i].returnValues.landlord === props.accounts[0]) {
+        this.events.contributionAddedSuccessfully.push({
+          inventor: propsEvents[i].returnValues.inventor,
+          ipfsFileHash: propsEvents[i].returnValues.ipfsFileHash,
+        });
+      }
+    }
+    console.log(this.events.contributionAddedSuccessfully);
   }
 
   progressbarColors = [
@@ -78,6 +105,9 @@ class ShareProposal extends Component {
   };
 
 
+
+
+
   createSharesBar() {
     let shares = [];
     for (var i = 0; i < this.testSharesProposal.length; i++) {
@@ -102,7 +132,17 @@ class ShareProposal extends Component {
     console.log("Files sent");
   }
 
+  downloadPdf(ipfsFileHash) {
+    this.ipfsApi.get(ipfsFileHash, function (err, files) {
+      files.forEach((file) => {
+        console.log(file.path)
+        console.log(file.content.toString('utf8'))
+      })
+    })
+  }
+
   render() {
+    let self = this;
     const showNewProposal = this.state.showNewProposal;
 
     let form = <div />;
@@ -205,7 +245,7 @@ class ShareProposal extends Component {
         <p />
 
         <div className="card">
-          <h5 className="card-header">Files for Patent Agent</h5>
+          <h5 className="card-header">Upload Contribution</h5>
               <div>
                 <AddContributionContainer />
               </div>
@@ -226,9 +266,40 @@ class ShareProposal extends Component {
                   Send
                 </button>
               </div>
-            </form>
-          </div>*/}
-        </div>
+            </form>*/}
+         </div>
+
+          <p />   
+      
+        <div className="card">
+            <h5 className="card-header">Contribution List</h5>
+            <table>
+              <thead>
+                <tr>
+                  <th>Inventor</th>
+                  <th>File hash</th>
+                </tr>
+              </thead>
+              {this.events.contributionAddedSuccessfully.map(function(event, i) {
+                  return (
+                    <tbody key={i}>
+                      <tr>
+                        <td>
+                          <Blockies seed={event.inventor} size={10} scale={10} />
+                          {event.inventor}
+                        </td>
+                        <td>{event.ipfsFileHash}</td>
+                        <td>
+                        <button className="form-control btn btn-primary" /*onClick={self.downloadPdf(event.ipfsFileHash)}*/>
+                          Download
+                        </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  );
+                })}
+             </table>
+          </div>
       </div>
     );
   }
