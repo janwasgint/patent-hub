@@ -45,9 +45,7 @@ contract PatentHub is Host {
 	    bool signed;
 	}
 	
-	
-	// events
-	
+		
 	    // contribution phase
 	        // when a contribution was saved to the blockchain
     event contributionAddedSuccessfully(address indexed inventor, string ipfsFileHash);

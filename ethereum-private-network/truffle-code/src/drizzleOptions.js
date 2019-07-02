@@ -19,17 +19,59 @@ const drizzleOptions = {
       web3Contract: new web3.eth.Contract(PatentHub.abi, deployedAddress)
     }
   ],
-  /*events: {
+  events: {
     PatentHub: [
       {
-        eventName: 'dataRequestInitiated',
+        eventName: 'participantRegistered',
         eventOptions: {
           fromBlock: 0,
           toBlock: 'latest'
         }
       },
       {
-        eventName: 'employeeLegitimises',
+        eventName: 'contributionAddedSuccessfully',
+        eventOptions: {
+          fromBlock: 0,
+          toBlock: 'latest'
+        }
+      },
+      {
+        eventName: 'sharesProposalSubmitted',
+        eventOptions: {
+          fromBlock: 0,
+          toBlock: 'latest'
+        }
+      },
+      {
+        eventName: 'contributionPhaseFinished',
+        eventOptions: {
+          fromBlock: 0,
+          toBlock: 'latest'
+        }
+      },
+      {
+        eventName: 'approvePatentAgentContractRequest',
+        eventOptions: {
+          fromBlock: 0,
+          toBlock: 'latest'
+        }
+      },
+      {
+        eventName: 'patentAgentInventorsContractApproved',
+        eventOptions: {
+          fromBlock: 0,
+          toBlock: 'latest'
+        }
+      },
+      {
+        eventName: 'patentDraftUpdated',
+        eventOptions: {
+          fromBlock: 0,
+          toBlock: 'latest'
+        }
+      },
+      {
+        eventName: 'nationalizedPatentProposalUpdated',
         eventOptions: {
           fromBlock: 0,
           toBlock: 'latest'
@@ -43,35 +85,28 @@ const drizzleOptions = {
         }
       },
       {
-        eventName: 'approveContractResponse',
+        eventName: 'contractApproved',
         eventOptions: {
           fromBlock: 0,
           toBlock: 'latest'
         }
       },
       {
-        eventName: 'updateHA',
+        eventName: 'paymentRequest',
         eventOptions: {
           fromBlock: 0,
           toBlock: 'latest'
         }
       },
       {
-        eventName: 'verificationRequest',
-        eventOptions: {
-          fromBlock: 0,
-          toBlock: 'latest'
-        }
-      },
-      {
-        eventName: 'verificationResponse',
+        eventName: 'nationalPatentAccepted',
         eventOptions: {
           fromBlock: 0,
           toBlock: 'latest'
         }
       }
     ]
-  },*/
+  },
   polls: {
     accounts: 1500
   }

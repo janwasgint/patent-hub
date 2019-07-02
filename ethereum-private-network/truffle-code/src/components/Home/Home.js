@@ -83,6 +83,27 @@ class Home extends Component {
         this.props.PatentHub.isRegisteredAsPatentOffice
       )
     ) {
+
+
+      // local copy of the events we are interested in
+      this.events = {
+        participantRegistered: [],
+      };
+
+      // fetch all events we have to listen to from the contract
+      let propsEvents = this.props.PatentHub.events;
+      //console.log(propsEvents);
+      // iterate all events to get the one we are interested in - participantRegistered(address indexed participant, string role)
+      // for events parameters see PatentHub.sol
+      for (var i = 0; i < propsEvents.length; i++) {
+        if (propsEvents[i].event === 'participantRegistered') {// && propsEvents[i].returnValues.landlord === props.accounts[0]) {
+          this.events.participantRegistered.push({
+            participant: propsEvents[i].returnValues.participant,
+            role: propsEvents[i].returnValues.role,
+          });
+        }
+      }
+      console.log(this.events.participantRegistered);
       return;
     }
 
@@ -155,13 +176,42 @@ class Home extends Component {
           </div>
 
           <div className="pure-u-1-1">
-            <h2>Contract actions</h2>
+            <h2 className="card-header">Contract actions</h2>
             {this.state.role === "Host" && (
               <div>
-                <p>
-                  <strong>Register Actor</strong>:
-                </p>
-                <HostSelect />
+                <div>
+                  <p>
+                    <strong>Register Actor</strong>:
+                  </p>
+                  <HostSelect />
+                </div>
+
+                <p />   
+
+                <div className="card">
+                    <h5 className="card-header">Registered Participants</h5>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Address</th>
+                          <th>Role</th>
+                        </tr>
+                      </thead>
+                      {this.events.participantRegistered.map(function(event, i) {
+                          return (
+                            <tbody key={i}>
+                              <tr>
+                                <td>
+                                  <Blockies seed={event.participant} size={10} scale={10} />
+                                  {event.participant}
+                                </td>
+                                <td>{event.role}</td>
+                              </tr>
+                            </tbody>
+                          );
+                        })}
+                     </table>
+                </div>
               </div>
             )}
             {this.state.role === "Unregistered" && (
@@ -201,16 +251,16 @@ class Home extends Component {
             <br />
             <br />
           </div>
-
-          <div className="pure-u-1-1">
+       
+          {/*<div className="pure-u-1-1">
             {role === "Host" && <h2>Events</h2>}
-            {/*{role === 'Employer' && <h2>Events</h2>}
+            {role === 'Employer' && <h2>Events</h2>}
             {role === 'Employee' && <h2>Data Requests</h2>}
             {role === 'Landlord' && <h2>Data Approvals</h2>}
-            <EventsContainer role={role} />*/}
+            <EventsContainer role={role} />
             <br />
             <br />
-          </div>
+          </div>*/}
         </div>
       </main>
     );
