@@ -547,3 +547,4 @@ contract PatentHub is Host {
         emit nationalPatentAccepted(patent.jurisdiction, patent.detailedDescriptionText, patent.backgroundText, patent.abstractText, patent.summaryText, patent.drawingsIpfsFileHash);
     }
 }
+

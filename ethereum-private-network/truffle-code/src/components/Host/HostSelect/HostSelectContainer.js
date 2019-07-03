@@ -1,7 +1,7 @@
-import ShareProposal from './ShareProposal';
-import {
-  drizzleConnect
-} from 'drizzle-react';
+import { drizzleConnect } from 'drizzle-react';
+
+import HostSelect from './HostSelect';
+
 
 // May still need this even with data function to refresh component on updates for this contract.
 const mapStateToProps = (state) => {
@@ -13,6 +13,6 @@ const mapStateToProps = (state) => {
   };
 };
 
-const ShareProposalContainer = drizzleConnect(ShareProposal, mapStateToProps);
+const HostSelectContainer = drizzleConnect(HostSelect, mapStateToProps);
 
-export default ShareProposalContainer;
+export default HostSelectContainer;

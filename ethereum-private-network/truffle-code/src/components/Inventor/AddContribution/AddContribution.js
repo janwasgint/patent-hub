@@ -1,9 +1,11 @@
-import React, { Component } from "react";
-import PropTypes from "prop-types";
-import { getContract } from "./../../../utils/MyContracts.js";
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
-const ipfsAPI = require("ipfs-api");
-const pdfjsLib = require("pdfjs-dist");
+import { getContract } from './../../../utils/MyContracts.js';
+
+
+const ipfsAPI = require('ipfs-api');
+const pdfjsLib = require('pdfjs-dist');
 
 class AddContribution extends Component {
   constructor(props) {

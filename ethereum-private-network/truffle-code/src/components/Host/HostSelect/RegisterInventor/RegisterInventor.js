@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { getContract } from '../../../utils/MyContracts.js';
+
+import { getContract } from '../../../../utils/MyContracts.js';
+
 
 class RegisterInventor extends Component {
   constructor(props) {
@@ -34,6 +36,7 @@ class RegisterInventor extends Component {
         console.log(err.message);
       });
   };
+
   render() {
     return (
       <div>

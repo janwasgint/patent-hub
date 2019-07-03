@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { getContract } from '../../../utils/MyContracts.js';
 
-class RegisterPatentAgent extends Component {
+import { getContract } from '../../../../utils/MyContracts.js';
+
+
+class RegisterPatentOffice extends Component {
   constructor(props) {
     super(props);
     this.state = { value: '' };
@@ -20,14 +22,14 @@ class RegisterPatentAgent extends Component {
       account = result[0];
     });
 
-    var patentAgentAddr = this.state.value;
+    var patentOfficeAddr = this.state.value;
 
     getContract(this.context.drizzle)
       .then(function(instance) {
-        return instance.registerPatentAgent(patentAgentAddr, { from: account });
+        return instance.registerPatentOffice(patentOfficeAddr, { from: account });
       })
       .then(function(result) {
-        alert('Patent agent registered successfully! Transaction Hash: ' + result.tx);
+        alert('Patent office registered successfully! Transaction Hash: ' + result.tx);
         console.log(result);
       })
       .catch(function(err) {
@@ -44,8 +46,8 @@ class RegisterPatentAgent extends Component {
   }
 }
 
-RegisterPatentAgent.contextTypes = {
+RegisterPatentOffice.contextTypes = {
   drizzle: PropTypes.object
 };
 
-export default RegisterPatentAgent;
+export default RegisterPatentOffice;

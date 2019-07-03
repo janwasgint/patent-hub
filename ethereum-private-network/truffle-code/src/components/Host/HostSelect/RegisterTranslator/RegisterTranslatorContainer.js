@@ -1,6 +1,6 @@
 import { drizzleConnect } from 'drizzle-react';
 
-import AddContribution from './AddContribution';
+import RegisterTranslator from './RegisterTranslator';
 
 
 // May still need this even with data function to refresh component on updates for this contract.
@@ -13,6 +13,6 @@ const mapStateToProps = (state) => {
   };
 };
 
-const AddContributionContainer = drizzleConnect(AddContribution, mapStateToProps);
+const RegisterTranslatorContainer = drizzleConnect(RegisterTranslator, mapStateToProps);
 
-export default AddContributionContainer;
+export default RegisterTranslatorContainer;

@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
+
 import RegisterInventorContainer from './RegisterInventor/RegisterInventorContainer';
 import RegisterPatentAgentContainer from './RegisterPatentAgent/RegisterPatentAgentContainer';
 import RegisterDrawerContainer from './RegisterDrawer/RegisterDrawerContainer';
 import RegisterNationalizerContainer from './RegisterNationalizer/RegisterNationalizerContainer';
 import RegisterTranslatorContainer from './RegisterTranslator/RegisterTranslatorContainer';
 import RegisterPatentOfficeContainer from './RegisterPatentOffice/RegisterPatentOfficeContainer';
+
 
 class HostSelect extends Component {
   constructor(props) {
