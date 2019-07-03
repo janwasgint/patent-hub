@@ -18,4 +18,6 @@ truffle compile
 truffle migrate
 
 npm (or yarn) start
+
+In Metamask -> Settings -> Security & Privacy -> untoggle privacy mode
 ```

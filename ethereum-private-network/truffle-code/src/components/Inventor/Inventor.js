@@ -7,18 +7,19 @@ import AddContributionContainer from "./AddContribution/AddContributionContainer
 import ProposeShareForm from "./ProposeSharesForm";
 
 
-const ipfsAPI = require('ipfs-api');
-const pdfjsLib = require('pdfjs-dist');
+const ipfsAPI = require("ipfs-api");
+const pdfjsLib = require("pdfjs-dist");
 
 class Inventor extends Component {
   constructor(props) {
     super(props);
 
-    this.ipfsApi = ipfsAPI('localhost', 5001, 'https');
+    this.ipfsApi = ipfsAPI("localhost", 5001, "https");
 
     this.showNewProposalForm = this.showNewProposalForm.bind(this);
+    this.hideNewProposalForm = this.hideNewProposalForm.bind(this);
     this.proposeNewSharesDistribution = this.proposeNewSharesDistribution.bind(this);
-    this.cancelNewProposal = this.cancelNewProposal.bind(this);
+
     this.downloadPdf = this.downloadPdf.bind(this);
     this.state = { showNewProposal: false };
 
@@ -82,7 +83,7 @@ class Inventor extends Component {
       if (propsEvents[i].event === 'contributionAddedSuccessfully') {
         this.events.contributionAddedSuccessfully.push({
           inventor: propsEvents[i].returnValues.inventor,
-          ipfsFileHash: propsEvents[i].returnValues.ipfsFileHash,
+          ipfsFileHash: propsEvents[i].returnValues.ipfsFileHash
         });
       }
     }
@@ -93,6 +94,12 @@ class Inventor extends Component {
     "progress-bar bg-warning",
     "progress-bar bg-info",
     "progress-bar"
+  ];
+
+  inventors = [
+    ["Jan", "0x5764e7337dfae66f5ac5551ebb77307709fb0219"],
+    ["Luca", "0x11c2e86ebecf701c265f6d19036ec90d277dd2b3"],
+    ["Korbi", "0xc33a1d62e6de00d4c9b135718280411101bcb9dd"]
   ];
 
   testSharesProposal = [["A", "33%"], ["InventorXYZ", "50%"], ["D", "17%"]];
@@ -137,12 +144,12 @@ class Inventor extends Component {
     this.setState({ showNewProposal: true });
   }
 
-  cancelNewProposal() {
-    console.log("cancel");
+  hideNewProposalForm() {
     this.setState({ showNewProposal: false });
   }
 
-  proposeNewSharesDistribution() {
+  proposeNewSharesDistribution(inventors) {
+    console.log("inventorShares:", inventors);
     var account = '';
     this.context.drizzle.web3.eth.getAccounts(function(error, result) {
      if (error != null) console.log("Could not get accounts!");
@@ -198,12 +205,12 @@ class Inventor extends Component {
   }
 
   downloadPdf(ipfsFileHash) {
-    this.ipfsApi.get(ipfsFileHash, function (err, files) {
-      files.forEach((file) => {
-        console.log(file.path)
-        console.log(file.content.toString('utf8'))
-      })
-    })
+    this.ipfsApi.get(ipfsFileHash, function(err, files) {
+      files.forEach(file => {
+        console.log(file.path);
+        console.log(file.content.toString("utf8"));
+      });
+    });
   }
 
   render() {
@@ -214,8 +221,9 @@ class Inventor extends Component {
     if (showNewProposal) {
       form = (
         <ProposeShareForm
-          cancel={() => this.cancelNewProposal()}
-          propose={() => this.proposeNewSharesDistribution()}
+          inventors={this.inventors}
+          hide={() => this.hideNewProposalForm()}
+          propose={this.proposeNewShareDistribution}
         />
       );
     }

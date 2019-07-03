@@ -12,10 +12,10 @@ class AddContribution extends Component {
     super(props);
     this.state = {
       added_file_hash: null,
-      value: ''
+      value: ""
     };
     //this.ipfsApi = ipfsAPI('localhost', '5001');host: '1.1.1.1', port: '80'
-    this.ipfsApi = ipfsAPI('localhost', 5001, 'https');
+    this.ipfsApi = ipfsAPI("localhost", 5001, "https");
 
     // bind methods
     this.captureFile = this.captureFile.bind(this);
@@ -27,7 +27,7 @@ class AddContribution extends Component {
   handleChange(event) {
     this.setState({ value: event.target.value });
   }
-    
+
   captureFile(event) {
     event.stopPropagation();
     event.preventDefault();
@@ -41,24 +41,33 @@ class AddContribution extends Component {
     let ipfsId;
     const buffer = Buffer.from(reader.result);
     this.ipfsApi
-      .add(buffer, { progress: (prog) => console.log(`received: ${prog}`) })
-      .then((response) => {
+      .add(buffer, { progress: prog => console.log(`received: ${prog}`) })
+      .then(response => {
         console.log(response);
         ipfsId = response[0].hash;
         console.log(ipfsId);
         this.setState({ added_file_hash: ipfsId });
       })
-      .catch((err) => {
+      .catch(err => {
         console.error(err);
       });
   }
 
-  onClick = (e) => {
+  downloadPdf() {
+    this.ipfsApi.get(this.state.added_file_hash, function(err, files) {
+      files.forEach(file => {
+        console.log(file.path);
+        console.log(file.content.toString("utf8"));
+      });
+    });
+  }
+
+  onClick = e => {
     const self = this;
     var ipfsId = self.state.added_file_hash;
     console.log(ipfsId);
 
-    var account = '';
+    var account = "";
     this.context.drizzle.web3.eth.getAccounts(function(error, result) {
       if (error != null) console.log("Could not get accounts!");
       account = result[0];
@@ -69,11 +78,16 @@ class AddContribution extends Component {
 
     getContract(this.context.drizzle)
       .then(function(instance) {
-        console.log('Sending filehash to contract...');
+        console.log("Sending filehash to contract...");
         return instance.addContribution(ipfsId, { from: account });
       })
       .then(function(result) {
-        alert('Contribution added successfully! Transaction Hash: ' + result.tx + '\nIpfs File Hash: ' + ipfsId);
+        alert(
+          "Contribution added successfully! Transaction Hash: " +
+            result.tx +
+            "\nIpfs File Hash: " +
+            ipfsId
+        );
         console.log(result);
       })
       .catch(function(err) {
@@ -87,14 +101,26 @@ class AddContribution extends Component {
 
   render() {
     return (
-      <div>
+      <div className="form-group">
         <form id="captureMedia" onSubmit={this.handleSubmit}>
           <input type="file" onChange={this.captureFile} />
         </form>
-        <input type="text" value={this.state.added_file_hash} onChange={this.handleChange} />
-        <button onClick={this.onClick}>Send</button>
-        <canvas width="2" height="2" id="the-canvas2" />
+        <input
+          type="text"
+          value={this.state.added_file_hash}
+          onChange={this.handleChange}
+        />
+        <div> </div>
         <br />
+
+        <button
+          type="button"
+          className="form-control btn btn-primary"
+          onClick={this.onClick}
+        >
+          Send
+        </button>
+        <canvas width="2" height="2" id="the-canvas2" />
         <br />
       </div>
     );

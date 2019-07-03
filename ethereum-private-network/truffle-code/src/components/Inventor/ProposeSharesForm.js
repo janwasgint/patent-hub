@@ -4,22 +4,35 @@ import PropTypes from "prop-types";
 class ProposeSharesForm extends Component {
   constructor(props) {
     super(props);
+
+    this.state = { shares: [] };
   }
 
-  testInventors = ["A", "B", "C", "D", "E"];
+  inventors = this.props.inventors;
+
+  handleSubmit = e => {
+    e.preventDefault();
+
+    let inventors = this.inventors.map((inventor, index) => {
+      inventor.push(e.target[index].value);
+      return inventor;
+    });
+    this.props.propose(inventors);
+  };
 
   listInventors() {
-    let inventors = [];
-    for (var i = 0; i < this.testInventors.length; i++) {
-      inventors.push(
-        <div>
+    let inventorShares = [];
+    for (var i = 0; i < this.inventors.length; i++) {
+      inventorShares.push(
+        <div key={i}>
           <div className="input-group mb-3">
             <div className="input-group-prepend">
-              <label className="input-group-text" for="inputGroupSelect01">
-                {this.testInventors[i]}
+              <label className="input-group-text" htmlFor="inputGroupSelect01">
+                {this.inventors[i][0]}
               </label>
             </div>
             <input
+              required="true"
               type="number"
               className="form-control"
               placeholder="Contribution in %"
@@ -28,23 +41,18 @@ class ProposeSharesForm extends Component {
         </div>
       );
     }
-    return inventors;
+    return inventorShares;
   }
 
   render() {
-    console.log(this.props);
     return (
       <div>
-        <form>
+        <form onSubmit={this.handleSubmit}>
           <div> {this.listInventors()}</div>
           <p />
           <div className="row">
             <div className="col">
-              <button
-                type="button"
-                className="form-control btn btn-primary"
-                onClick={this.props.propose}
-              >
+              <button type="submit" className="form-control btn btn-primary">
                 Propose
               </button>
             </div>
@@ -52,7 +60,7 @@ class ProposeSharesForm extends Component {
               <button
                 type="button"
                 className="form-control btn btn-danger"
-                onClick={this.props.cancel}
+                onClick={this.props.hide}
               >
                 Cancel
               </button>
