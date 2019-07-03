@@ -51,7 +51,7 @@ contract PatentHub is Host {
     event contributionAddedSuccessfully(address indexed inventor, string ipfsFileHash);
     
             // when a shares proposal was submitted
-    event sharesProposalSubmitted(address indexed proposingInventor);
+    event sharesProposalSubmitted(address indexed proposingInventor, address indexed shareHolder, uint percentage);
     
             // when all shares are accepted
 	event contributionPhaseFinished();
@@ -192,9 +192,9 @@ contract PatentHub is Host {
 		for (uint i=0; i<inventors.length; i++) {
             Share memory share = Share(inventors[i], percentages[i], false);
             shares.push(share);
+
+            emit sharesProposalSubmitted(msg.sender, inventors[i], percentages[i]);
         }
-        
-        emit sharesProposalSubmitted(msg.sender);
 	}
 	
 	function getAllInventors() public onlyPartiesWithAccessToPatent() view returns(address[] memory inventors) {
