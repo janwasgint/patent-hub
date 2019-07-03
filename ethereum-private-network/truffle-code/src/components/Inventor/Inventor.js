@@ -4,7 +4,7 @@ import Blockies from 'react-blockies';
 
 import { getContract } from '../../utils/MyContracts.js';
 import AddContributionContainer from "./AddContribution/AddContributionContainer";
-import ProposeShareForm from "./ProposeSharesForm";
+import ProposeSharesForm from "./ProposeSharesForm";
 
 
 const ipfsAPI = require("ipfs-api");
@@ -18,7 +18,10 @@ class Inventor extends Component {
 
     this.showNewProposalForm = this.showNewProposalForm.bind(this);
     this.hideNewProposalForm = this.hideNewProposalForm.bind(this);
+    
     this.proposeNewSharesDistribution = this.proposeNewSharesDistribution.bind(this);
+    this.createSharesBar = this.createSharesBar.bind(this);
+    this.acceptSharesProposal = this.acceptSharesProposal.bind(this);
 
     this.downloadPdf = this.downloadPdf.bind(this);
     this.state = { showNewProposal: false };
@@ -96,7 +99,7 @@ class Inventor extends Component {
     "progress-bar"
   ];
 
-  inventors = [
+  testInventors = [
     ["Jan", "0x5764e7337dfae66f5ac5551ebb77307709fb0219"],
     ["Luca", "0x11c2e86ebecf701c265f6d19036ec90d277dd2b3"],
     ["Korbi", "0xc33a1d62e6de00d4c9b135718280411101bcb9dd"]
@@ -107,6 +110,8 @@ class Inventor extends Component {
   componentDidMount() { }
 
   acceptSharesProposal() {
+        console.log("accepted");
+
     var account = '';
     this.context.drizzle.web3.eth.getAccounts(function(error, result) {
      if (error != null) console.log("Could not get accounts!");
@@ -148,14 +153,14 @@ class Inventor extends Component {
     this.setState({ showNewProposal: false });
   }
 
-  proposeNewSharesDistribution(inventors) {
-    console.log("inventorShares:", inventors);
-    var account = '';
-    this.context.drizzle.web3.eth.getAccounts(function(error, result) {
-     if (error != null) console.log("Could not get accounts!");
-     account = result[0];
-    });
-	  // function addSharesProposal(address[] memory inventors, uint[] memory percentages) public onlyInventor() {
+  proposeNewSharesDistribution(testInventors) {
+
+
+    var inventorAdresses = testInventors.map(inventor => 
+      {return inventor[1]})
+
+    var inventorShares = testInventors.map(inventor => {return parseInt(inventor[2])})
+    
 
     // get proposed shares
     var shares = [];
@@ -164,12 +169,25 @@ class Inventor extends Component {
         shares.push(50)
       }
     }
-    console.log("Proposed shares: " + shares);
+    console.log("Proposed shares: " + inventorShares);
+
 
     var inventors = this.inventors
+    console.log("real Inventors:", inventors)
+        console.log("Inventors....", inventorShares, inventorAdresses)
+
+  // Here for Korbi
+    var account = '';
+    this.context.drizzle.web3.eth.getAccounts(function(error, result) {
+     if (error != null) console.log("Could not get accounts!");
+     account = result[0];
+    });
+    // function addSharesProposal(address[] memory inventors, uint[] memory percentages) public onlyInventor() {
     getContract(this.context.drizzle)
-      .then(function(instance) {
-        return instance.addSharesProposal(inventors, shares, { from: account });
+      .then(function(instance) {  
+        console.log("Inventors....", inventorShares, inventorAdresses)
+
+        return instance.addSharesProposal(inventorAdresses, inventorShares, { from: account });
       })
       .then(function(result) {
         alert('Shares proposed successfully! Transaction Hash: ' + result.tx);
@@ -182,18 +200,19 @@ class Inventor extends Component {
 
   createSharesBar() {
     let shares = [];
-    for (var i = 0; i < this.testSharesProposal.length; i++) {
+    console.log("shares: ", this.shares)
+    for (var i = 0; i < this.shares.length; i++) {
       shares.push(
         <div
           className={this.progressbarColors[i % this.progressbarColors.length]}
           role="progressbar"
-          style={{ width: this.testSharesProposal[i][1] }}
+          style={{ width: toString(this.shares[i].percentage)+"%" }}
           aria-valuenow="0"
           aria-valuemin="0"
           aria-valuemax="100"
-          key={this.testSharesProposal[i][0]}
+          key={i}
         >
-          {this.testSharesProposal[i][0]}: {this.testSharesProposal[i][1]}
+          {this.shares[i].percentage}
         </div>
       );
     }
@@ -220,10 +239,10 @@ class Inventor extends Component {
     let form = <div />;
     if (showNewProposal) {
       form = (
-        <ProposeShareForm
-          inventors={this.inventors}
+        <ProposeSharesForm
+          inventors={this.testInventors}
           hide={() => this.hideNewProposalForm()}
-          propose={this.proposeNewShareDistribution}
+          propose={this.proposeNewSharesDistribution}
         />
       );
     }
@@ -287,7 +306,7 @@ class Inventor extends Component {
                     type="button"
                     className="form-control btn btn-success"
                     disabled={this.state.showNewProposal}
-                    onClick={this.acceptShareProposal}
+                    onClick={this.acceptSharesProposal}
                   >
                     Accept
                   </button>
