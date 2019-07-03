@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 
-class SharesProposalForm extends Component {
+class ProposeSharesForm extends Component {
   constructor(props) {
     super(props);
   }
@@ -63,4 +63,5 @@ class SharesProposalForm extends Component {
     );
   }
 }
-export default SharesProposalForm;
+
+export default ProposeSharesForm;

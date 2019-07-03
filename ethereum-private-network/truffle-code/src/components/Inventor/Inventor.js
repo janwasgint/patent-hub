@@ -1,41 +1,92 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Blockies from 'react-blockies';
-import SharesProposalForm from "./SharesProposalForm";
+
+import { getContract } from '../../utils/MyContracts.js';
 import AddContributionContainer from "./AddContribution/AddContributionContainer";
+import ProposeShareForm from "./ProposeSharesForm";
+
 
 const ipfsAPI = require('ipfs-api');
 const pdfjsLib = require('pdfjs-dist');
 
-class ShareProposal extends Component {
+class Inventor extends Component {
   constructor(props) {
     super(props);
 
     this.ipfsApi = ipfsAPI('localhost', 5001, 'https');
 
     this.showNewProposalForm = this.showNewProposalForm.bind(this);
+    this.proposeNewSharesDistribution = this.proposeNewSharesDistribution.bind(this);
     this.cancelNewProposal = this.cancelNewProposal.bind(this);
     this.downloadPdf = this.downloadPdf.bind(this);
     this.state = { showNewProposal: false };
 
     // local copy of the events we are interested in
     this.events = {
+      participantRegistered: [],
       contributionAddedSuccessfully: [],
+      sharesProposalSubmitted: [],
     };
 
     // fetch all events we have to listen to from the contract
     let propsEvents = this.props.PatentHub.events;
+
+    //console.log(propsEvents);
+    // iterate all events to get the one we are interested in - participantRegistered(address indexed participant, string role)
+    // for events parameters see PatentHub.sol
+    for (var i = 0; i < propsEvents.length; i++) {
+      if (propsEvents[i].event === 'participantRegistered') {// && propsEvents[i].returnValues.landlord === props.accounts[0]) {
+        this.events.participantRegistered.push({
+          participant: propsEvents[i].returnValues.participant,
+          role: propsEvents[i].returnValues.role,
+        });
+      }
+    }
+    console.log("Participants: " + this.events.participantRegistered);
+
+    // get inventors
+    this.inventors = [];
+    for (var i = 0; i < this.events.participantRegistered.length; i++) {
+      if (this.events.participantRegistered[i].role == 'Inventor') {
+        this.inventors.push(this.events.participantRegistered[i].participant)
+      }
+    }
+    console.log(this.inventors);
+
+
+    //console.log(propsEvents);
+    // iterate all events to get the one we are interested in - sharesProposalSubmitted(address indexed proposingInventor, address indexed shareHolder, uint percentage);
+    // for events parameters see PatentHub.sol
+    for (var i = 0; i < propsEvents.length; i++) {
+      if (propsEvents[i].event === 'sharesProposalSubmitted') {
+        this.events.sharesProposalSubmitted.push({
+          proposingInventor: propsEvents[i].returnValues.proposingInventor,
+          shareHolder: propsEvents[i].returnValues.shareHolder,
+          percentage: propsEvents[i].returnValues.percentage,
+        });
+      }
+    }
+    console.log("Shares: " + this.events.sharesProposalSubmitted);
+
+
+    this.shares = [];
+    for (var i = this.events.sharesProposalSubmitted.length - 1; i >= this.events.sharesProposalSubmitted.length - this.inventors.length; i--) {
+      this.shares.push(this.events.sharesProposalSubmitted[i])
+    }
+
+    console.log(this.shares);
     // iterate all events to get the one we are interested in - contributionAddedSuccessfully(address indexed inventor, string ipfsFileHash)
     // for events parameteres see PatentHub.sol
     for (var i = 0; i < propsEvents.length; i++) {
-      if (propsEvents[i].event === 'contributionAddedSuccessfully') {// && propsEvents[i].returnValues.landlord === props.accounts[0]) {
+      if (propsEvents[i].event === 'contributionAddedSuccessfully') {
         this.events.contributionAddedSuccessfully.push({
           inventor: propsEvents[i].returnValues.inventor,
           ipfsFileHash: propsEvents[i].returnValues.ipfsFileHash,
         });
       }
     }
-    console.log(this.events.contributionAddedSuccessfully);
+    console.log("Contributions: " + this.events.contributionAddedSuccessfully);
   }
 
   progressbarColors = [
@@ -46,9 +97,27 @@ class ShareProposal extends Component {
 
   testSharesProposal = [["A", "33%"], ["InventorXYZ", "50%"], ["D", "17%"]];
 
-  componentDidMount() {}
+  componentDidMount() { }
 
-  acceptShareProposal() {
+  acceptSharesProposal() {
+    var account = '';
+    this.context.drizzle.web3.eth.getAccounts(function(error, result) {
+     if (error != null) console.log("Could not get accounts!");
+     account = result[0];
+    });
+
+    getContract(this.context.drizzle)
+      .then(function(instance) {
+        return instance.approveShare({ from: account });
+      })
+      .then(function(result) {
+        alert('Shares proposal approved successfully! Transaction Hash: ' + result.tx);
+        console.log(result);
+      })
+      .catch(function(err) {
+        console.log(err.message);
+      });
+
     console.log("accepted");
   }
 
@@ -56,7 +125,7 @@ class ShareProposal extends Component {
     console.log("accepted");
   }
 
-  rejectShareProposal() {
+  rejectSharesProposal() {
     console.log("rejected");
   }
 
@@ -69,44 +138,40 @@ class ShareProposal extends Component {
   }
 
   cancelNewProposal() {
-    console.log("cancel2");
-
+    console.log("cancel");
     this.setState({ showNewProposal: false });
   }
 
-  proposeNewShareDistribution() {
-  /*
-    // read the values
-    // list of inventors addresses, list of shares
-
-    const self = this;
-  
+  proposeNewSharesDistribution() {
     var account = '';
     this.context.drizzle.web3.eth.getAccounts(function(error, result) {
-      if (error != null) console.log("Could not get accounts!");
-      account = result[0];
+     if (error != null) console.log("Could not get accounts!");
+     account = result[0];
     });
+	  // function addSharesProposal(address[] memory inventors, uint[] memory percentages) public onlyInventor() {
 
-    var inventorAddr = self.state.value;
-    console.log(inventorAddr);
+    // get proposed shares
+    var shares = [];
+    for (var i = 0; i < this.events.participantRegistered.length; i++) {
+      if (this.events.participantRegistered[i].role == 'Inventor') {
+        shares.push(50)
+      }
+    }
+    console.log("Proposed shares: " + shares);
 
+    var inventors = this.inventors
     getContract(this.context.drizzle)
       .then(function(instance) {
-        console.log('Sending share to contract...');
-        //return instance.AddShare(inventors, shares, { from: account });
+        return instance.addSharesProposal(inventors, shares, { from: account });
       })
       .then(function(result) {
-        alert('Share added successfully! Transaction Hash: ' + result.tx);
+        alert('Shares proposed successfully! Transaction Hash: ' + result.tx);
         console.log(result);
       })
       .catch(function(err) {
         console.log(err.message);
-      });*/
-  };
-
-
-
-
+      });
+  }
 
   createSharesBar() {
     let shares = [];
@@ -148,15 +213,56 @@ class ShareProposal extends Component {
     let form = <div />;
     if (showNewProposal) {
       form = (
-        <SharesProposalForm
+        <ProposeShareForm
           cancel={() => this.cancelNewProposal()}
-          propose={() => this.proposeNewShareDistribution()}
+          propose={() => this.proposeNewSharesDistribution()}
         />
       );
     }
 
     return (
       <div>
+        <div className="card">
+          <h5 className="card-header">Upload Contribution</h5>
+              <div>
+                <AddContributionContainer />
+              </div>
+         </div>
+
+        <p />
+
+        <div className="card">
+            <h5 className="card-header">Contribution List</h5>
+            <table>
+              <thead>
+                <tr>
+                  <th>Inventor</th>
+                  <th>File hash</th>
+                </tr>
+              </thead>
+              {this.events.contributionAddedSuccessfully.map(function(event, i) {
+                return (
+                  <tbody key={i}>
+                    <tr>
+                      <td>
+                        <Blockies seed={event.inventor} size={10} scale={10} />
+                        {event.inventor}
+                      </td>
+                      <td>{event.ipfsFileHash}</td>
+                      /*<td>
+                      <button className="form-control btn btn-primary" onClick={self.downloadPdf(event.ipfsFileHash)}>
+                        Download
+                      </button>
+                      </td>*/
+                    </tr>
+                  </tbody>
+                );
+              })}
+           </table>
+        </div>
+
+        <p />   
+     
         <div className="card">
           <h5 className="card-header">Share Proposal</h5>
           <div className="card-body">
@@ -241,68 +347,13 @@ class ShareProposal extends Component {
             </form>
           </div>
         </div>
-
-        <p />
-
-        <div className="card">
-          <h5 className="card-header">Upload Contribution</h5>
-              <div>
-                <AddContributionContainer />
-              </div>
-          {/*<div className="card-body">
-            <form>
-              <div className="form-group">
-                <input
-                  type="file"
-                  className="form-control-file"
-                  id="exampleFormControlFile1"
-                />
-                <p />
-                <button
-                  type="button"
-                  className="form-control btn btn-primary"
-                  onClick={this.sendFiles}
-                >
-                  Send
-                </button>
-              </div>
-            </form>*/}
-         </div>
-
-          <p />   
-      
-        <div className="card">
-            <h5 className="card-header">Contribution List</h5>
-            <table>
-              <thead>
-                <tr>
-                  <th>Inventor</th>
-                  <th>File hash</th>
-                </tr>
-              </thead>
-              {this.events.contributionAddedSuccessfully.map(function(event, i) {
-                  return (
-                    <tbody key={i}>
-                      <tr>
-                        <td>
-                          <Blockies seed={event.inventor} size={10} scale={10} />
-                          {event.inventor}
-                        </td>
-                        <td>{event.ipfsFileHash}</td>
-                        <td>
-                        <button className="form-control btn btn-primary" /*onClick={self.downloadPdf(event.ipfsFileHash)}*/>
-                          Download
-                        </button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  );
-                })}
-             </table>
-          </div>
       </div>
     );
   }
 }
 
-export default ShareProposal;
+Inventor.contextTypes = {
+  drizzle: PropTypes.object
+};
+
+export default Inventor;

@@ -3,16 +3,10 @@ import { AccountData } from "drizzle-react-components";
 import PropTypes from "prop-types";
 import Blockies from "react-blockies";
 
-// Inventor components
-import ShareProposalContainer from "../Inventor/ShareProposalContainer";
-
-//Patent Agent
+import HostContainer from "../Host/HostContainer";
+import InventorContainer from "../Inventor/InventorContainer";
 import PatentAgentUIContainer from "../PatentAgent/PatentAgentUIContainer";
 
-//import VerifyDataContainer from '../VerifyData/VerifyDataContainer';
-//import EventsContainer from '../Events/EventsContainer';
-import HostSelect from "../HostSelect/HostSelect";
-//import UploadContractContainer from '../UploadContract/UploadContractContainer';
 
 class Home extends Component {
   constructor(props) {
@@ -83,27 +77,6 @@ class Home extends Component {
         this.props.PatentHub.isRegisteredAsPatentOffice
       )
     ) {
-
-
-      // local copy of the events we are interested in
-      this.events = {
-        participantRegistered: [],
-      };
-
-      // fetch all events we have to listen to from the contract
-      let propsEvents = this.props.PatentHub.events;
-      //console.log(propsEvents);
-      // iterate all events to get the one we are interested in - participantRegistered(address indexed participant, string role)
-      // for events parameters see PatentHub.sol
-      for (var i = 0; i < propsEvents.length; i++) {
-        if (propsEvents[i].event === 'participantRegistered') {// && propsEvents[i].returnValues.landlord === props.accounts[0]) {
-          this.events.participantRegistered.push({
-            participant: propsEvents[i].returnValues.participant,
-            role: propsEvents[i].returnValues.role,
-          });
-        }
-      }
-      console.log(this.events.participantRegistered);
       return;
     }
 
@@ -175,55 +148,22 @@ class Home extends Component {
             </div>
           </div>
 
-          <div className="pure-u-1-1">
-            <h2 className="card-header">Contract actions</h2>
-            {this.state.role === "Host" && (
-              <div>
-                <div>
-                  <p>
-                    <strong>Register Actor</strong>:
-                  </p>
-                  <HostSelect />
-                </div>
-
-                <p />   
-
-                <div className="card">
-                    <h5 className="card-header">Registered Participants</h5>
-                    <table>
-                      <thead>
-                        <tr>
-                          <th>Address</th>
-                          <th>Role</th>
-                        </tr>
-                      </thead>
-                      {this.events.participantRegistered.map(function(event, i) {
-                          return (
-                            <tbody key={i}>
-                              <tr>
-                                <td>
-                                  <Blockies seed={event.participant} size={10} scale={10} />
-                                  {event.participant}
-                                </td>
-                                <td>{event.role}</td>
-                              </tr>
-                            </tbody>
-                          );
-                        })}
-                     </table>
-                </div>
-              </div>
-            )}
-            {this.state.role === "Unregistered" && (
+         <div className="pure-u-1-1">
+           {this.state.role === "Unregistered" && (
               <div>
                 <p>
                   <strong>I am not registered!</strong>
                 </p>
               </div>
             )}
+            {this.state.role === "Host" && (
+              <div>
+                <HostContainer />
+              </div>
+            )}
             {this.state.role === "Inventor" && (
               <div>
-                <ShareProposalContainer />
+                <InventorContainer />
               </div>
             )}
             {this.state.role === "PatentAgent" && (
@@ -231,36 +171,29 @@ class Home extends Component {
                 <PatentAgentUIContainer />
               </div>
             )}
-            {/*{role === 'Landlord' && (
+            {this.state.role === "Drawer" && (
               <div>
-               <p>
-                  <strong>Verify Data as a Landlord</strong>:
-                </p>
-                <VerifyDataContainer />
+                <InventorContainer />
               </div>
             )}
-            {role === 'Landlord' && (
+            {this.state.role === "Translator" && (
               <div>
-                <p>
-                  <strong>Upload Contract</strong>:
-                </p>
-                <UploadContractContainer />
+                <InventorContainer />
               </div>
-            )}*/}
-
+            )}
+            {this.state.role === "Nationalizer" && (
+              <div>
+                <PatentAgentUIContainer />
+              </div>
+            )}
+            {this.state.role === "Patent Office" && (
+              <div>
+                <PatentAgentUIContainer />
+              </div>
+            )}
             <br />
             <br />
-          </div>
-       
-          {/*<div className="pure-u-1-1">
-            {role === "Host" && <h2>Events</h2>}
-            {role === 'Employer' && <h2>Events</h2>}
-            {role === 'Employee' && <h2>Data Requests</h2>}
-            {role === 'Landlord' && <h2>Data Approvals</h2>}
-            <EventsContainer role={role} />
-            <br />
-            <br />
-          </div>*/}
+          </div>       
         </div>
       </main>
     );

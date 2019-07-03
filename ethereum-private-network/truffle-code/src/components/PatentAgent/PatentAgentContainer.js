@@ -1,4 +1,4 @@
-import RegisterNationalizer from './RegisterNationalizer';
+import Inventor from './Inventor';
 import { drizzleConnect } from 'drizzle-react';
 
 // May still need this even with data function to refresh component on updates for this contract.
@@ -11,6 +11,6 @@ const mapStateToProps = (state) => {
   };
 };
 
-const RegisterNationalizerContainer = drizzleConnect(RegisterNationalizer, mapStateToProps);
+const InventorContainer = drizzleConnect(Inventor, mapStateToProps);
 
-export default RegisterNationalizerContainer;
+export default InventorContainer;
