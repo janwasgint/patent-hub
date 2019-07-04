@@ -16,6 +16,7 @@ class Inventor extends Component {
   constructor(props) {
     super(props);
 
+    console.log("InventorProps:", props);
     this.ipfsApi = ipfsAPI("localhost", 5001, "https");
 
     this.showNewProposalForm = this.showNewProposalForm.bind(this);
@@ -34,7 +35,8 @@ class Inventor extends Component {
     this.events = {
       participantRegistered: [],
       contributionAddedSuccessfully: [],
-      sharesProposalSubmitted: []
+      sharesProposalSubmitted: [],
+      salaryProposalSubmitted: []
     };
 
     // fetch all events we have to listen to from the contract
@@ -324,7 +326,11 @@ class Inventor extends Component {
         <div className="card">
           <h5 className="card-header"> Salary Proposal </h5>
           <div className="card-body">
-            <SalaryProposal />
+            <SalaryProposal
+              events={this.events.salaryProposalSubmitted}
+              acceptPaymentProposal={this.acceptPaymentProposal}
+              rejectPaymentProposal={this.rejectPaymentProposal}
+            />
           </div>
         </div>
       </div>

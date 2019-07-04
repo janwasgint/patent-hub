@@ -1,8 +1,8 @@
-import PatentAgentUI from './PatentAgentUI';
-import { drizzleConnect } from 'drizzle-react';
+import { drizzleConnect } from "drizzle-react";
+import PatentAgentUI from "./PatentAgentUI";
 
 // May still need this even with data function to refresh component on updates for this contract.
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     accounts: state.accounts,
     PatentHub: state.contracts.PatentHub,

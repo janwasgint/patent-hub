@@ -1,7 +1,11 @@
-import React, { Component } from "react";
+import React, {
+  Component
+} from "react";
 import PropTypes from "prop-types";
 
-import { getContract } from "./../../../utils/MyContracts.js";
+import {
+  getContract
+} from "./../../../utils/MyContracts.js";
 
 const ipfsAPI = require("ipfs-api");
 const pdfjsLib = require("pdfjs-dist");
@@ -9,6 +13,7 @@ const pdfjsLib = require("pdfjs-dist");
 class AddContribution extends Component {
   constructor(props) {
     super(props);
+
     this.state = {
       added_file_hash: "",
       value: ""
@@ -24,7 +29,9 @@ class AddContribution extends Component {
   }
 
   handleChange(event) {
-    this.setState({ value: event.target.value });
+    this.setState({
+      value: event.target.value
+    });
   }
 
   captureFile(event) {
@@ -40,12 +47,16 @@ class AddContribution extends Component {
     let ipfsId;
     const buffer = Buffer.from(reader.result);
     this.ipfsApi
-      .add(buffer, { progress: prog => console.log(`received: ${prog}`) })
+      .add(buffer, {
+        progress: prog => console.log(`received: ${prog}`)
+      })
       .then(response => {
         console.log(response);
         ipfsId = response[0].hash;
         console.log(ipfsId);
-        this.setState({ added_file_hash: ipfsId });
+        this.setState({
+          added_file_hash: ipfsId
+        });
       })
       .catch(err => {
         console.error(err);
@@ -73,19 +84,21 @@ class AddContribution extends Component {
     });
 
     var inventorAddr = self.state.value;
-    console.log(inventorAddr);
 
     getContract(this.context.drizzle)
       .then(function(instance) {
         console.log("Sending filehash to contract...");
-        return instance.addContribution(ipfsId, { from: account });
+        console.log("Add contribution account", account);
+        return instance.addContribution(ipfsId, {
+          from: account
+        });
       })
       .then(function(result) {
         alert(
           "Contribution added successfully! Transaction Hash: " +
-            result.tx +
-            "\nIpfs File Hash: " +
-            ipfsId
+          result.tx +
+          "\nIpfs File Hash: " +
+          ipfsId
         );
         console.log(result);
       })
@@ -99,25 +112,38 @@ class AddContribution extends Component {
   }
 
   render() {
-    return (
-      <div className="form-group">
-        <form id="captureMedia" onSubmit={this.handleSubmit}>
-          <input type="file" onChange={this.captureFile} />
-        </form>
-        <input
-          type="text"
-          value={this.state.added_file_hash}
-          onChange={this.handleChange}
-        />
-        <p />
-        <button
-          type="button"
-          className="form-control btn btn-primary"
-          onClick={this.onClick}
-        >
-          Send
-        </button>
-      </div>
+    return ( <
+      div className = "form-group" >
+      <
+      form id = "captureMedia"
+      onSubmit = {
+        this.handleSubmit
+      } >
+      <
+      input type = "file"
+      onChange = {
+        this.captureFile
+      }
+      /> <
+      /form> <
+      label onChange = {
+        this.handleChange
+      }
+      htmlFor = "ipfsHash" > {
+        this.state.added_file_hash
+      } < /label>
+
+      <
+      p / >
+      <
+      button type = "button"
+      className = "form-control btn btn-primary"
+      onClick = {
+        this.onClick
+      } >
+      Send <
+      /button> <
+      /div>
     );
   }
 }

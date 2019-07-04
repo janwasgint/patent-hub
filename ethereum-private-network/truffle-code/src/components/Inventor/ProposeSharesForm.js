@@ -12,7 +12,7 @@ class ProposeSharesForm extends Component {
 
   handleSubmit = e => {
     e.preventDefault();
-
+    console.log("e", e.target);
     let inventors = this.inventors.map((inventor, index) => {
       inventor.push(e.target[index].value);
       return inventor;

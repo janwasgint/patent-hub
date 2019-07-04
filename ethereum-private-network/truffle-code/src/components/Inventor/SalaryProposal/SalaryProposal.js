@@ -9,36 +9,42 @@ class SalaryProposal extends Component {
   render() {
     return (
       <div>
-        <h5 className="card-title">
-          PatentAgentX proposed the following salary:
-        </h5>
-        <div className="alert alert-dark" role="alert">
-          {" "}
-          Gimme $$$
-        </div>
-        <p />
-        <form>
-          <div className="row">
-            <div className="col">
-              <button
-                type="button"
-                className="form-control btn btn-success"
-                onClick={this.acceptPaymentProposal}
-              >
-                Accept
-              </button>
+        {this.props.events && this.props.events.length ? (
+          <div>
+            <h5 className="card-title">
+              PatentAgentX proposed the following salary:
+            </h5>
+            <div className="alert alert-dark" role="alert">
+              {" "}
+              Gimme $$$
             </div>
-            <div className="col">
-              <button
-                type="button"
-                className="form-control btn btn-danger"
-                onClick={this.rejectPaymentProposal}
-              >
-                Reject
-              </button>
-            </div>
+            <p />
+            <form>
+              <div className="row">
+                <div className="col">
+                  <button
+                    type="button"
+                    className="form-control btn btn-success"
+                    onClick={this.props.acceptPaymentProposal}
+                  >
+                    Accept
+                  </button>
+                </div>
+                <div className="col">
+                  <button
+                    type="button"
+                    className="form-control btn btn-danger"
+                    onClick={this.props.rejectPaymentProposal}
+                  >
+                    Reject
+                  </button>
+                </div>
+              </div>
+            </form>
           </div>
-        </form>
+        ) : (
+          <div>No salary proposal has been submitted</div>
+        )}
       </div>
     );
   }
