@@ -1,17 +1,16 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
 
-import { getContract } from './../../../utils/MyContracts.js';
+import { getContract } from "./../../../utils/MyContracts.js";
 
-
-const ipfsAPI = require('ipfs-api');
-const pdfjsLib = require('pdfjs-dist');
+const ipfsAPI = require("ipfs-api");
+const pdfjsLib = require("pdfjs-dist");
 
 class AddContribution extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      added_file_hash: null,
+      added_file_hash: "",
       value: ""
     };
     //this.ipfsApi = ipfsAPI('localhost', '5001');host: '1.1.1.1', port: '80'
@@ -110,9 +109,7 @@ class AddContribution extends Component {
           value={this.state.added_file_hash}
           onChange={this.handleChange}
         />
-        <div> </div>
-        <br />
-
+        <p />
         <button
           type="button"
           className="form-control btn btn-primary"
@@ -120,8 +117,6 @@ class AddContribution extends Component {
         >
           Send
         </button>
-        <canvas width="2" height="2" id="the-canvas2" />
-        <br />
       </div>
     );
   }
