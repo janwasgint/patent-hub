@@ -7,7 +7,6 @@ import HostContainer from "../Host/HostContainer";
 import InventorContainer from "../Inventor/InventorContainer";
 import PatentAgentUIContainer from "../PatentAgent/PatentAgentUIContainer";
 
-
 class Home extends Component {
   constructor(props) {
     super(props);
@@ -128,8 +127,6 @@ class Home extends Component {
     }
 
     var myAddr = this.props.accounts[0];
-    let role = this.state.role;
-    let self = this;
 
     return (
       <main className="container">
@@ -148,8 +145,8 @@ class Home extends Component {
             </div>
           </div>
 
-         <div className="pure-u-1-1">
-           {this.state.role === "Unregistered" && (
+          <div className="pure-u-1-1">
+            {this.state.role === "Unregistered" && (
               <div>
                 <p>
                   <strong>I am not registered!</strong>
@@ -193,7 +190,7 @@ class Home extends Component {
             )}
             <br />
             <br />
-          </div>       
+          </div>
         </div>
       </main>
     );

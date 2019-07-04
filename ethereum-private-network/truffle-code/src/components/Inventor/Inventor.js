@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import Blockies from "react-blockies";
 
 import { getContract } from "../../utils/MyContracts.js";
 import AddContributionContainer from "./AddContribution/AddContributionContainer";
@@ -10,7 +9,6 @@ import SharesProposal from "./SharesProposal/SharesProposal";
 import SalaryProposal from "./SalaryProposal/SalaryProposal";
 
 const ipfsAPI = require("ipfs-api");
-const pdfjsLib = require("pdfjs-dist");
 
 class Inventor extends Component {
   constructor(props) {
@@ -137,28 +135,26 @@ class Inventor extends Component {
   componentDidMount() {}
 
   acceptSharesProposal() {
-    {
-      var account = "";
-      this.context.drizzle.web3.eth.getAccounts(function(error, result) {
-        if (error != null) console.log("Could not get accounts!");
-        account = result[0];
-      });
+    var account = "";
+    this.context.drizzle.web3.eth.getAccounts(function(error, result) {
+      if (error != null) console.log("Could not get accounts!");
+      account = result[0];
+    });
 
-      getContract(this.context.drizzle)
-        .then(function(instance) {
-          return instance.approveShare({ from: account });
-        })
-        .then(function(result) {
-          alert(
-            "Shares proposal approved successfully! Transaction Hash: " +
-              result.tx
-          );
-          console.log(result);
-        })
-        .catch(function(err) {
-          console.log(err.message);
-        });
-    }
+    getContract(this.context.drizzle)
+      .then(function(instance) {
+        return instance.approveShare({ from: account });
+      })
+      .then(function(result) {
+        alert(
+          "Shares proposal approved successfully! Transaction Hash: " +
+            result.tx
+        );
+        console.log(result);
+      })
+      .catch(function(err) {
+        console.log(err.message);
+      });
   }
 
   acceptPaymentProposal() {
@@ -191,8 +187,7 @@ class Inventor extends Component {
         return parseInt(inventor[2]);
       });
 
-      var inventors = this.inventors;
-
+      // Here for Korbi
       var account = "";
       this.context.drizzle.web3.eth.getAccounts(function(error, result) {
         if (error != null) console.log("Could not get accounts!");
@@ -218,7 +213,7 @@ class Inventor extends Component {
   mapNameToAddress(address) {
     var inventorName;
     this.inventorAndAddress.forEach(inventor => {
-      if (inventor.address.toUpperCase() == address.toUpperCase()) {
+      if (inventor.address.toUpperCase() === address.toUpperCase()) {
         inventorName = inventor.name;
       }
     });
@@ -229,7 +224,7 @@ class Inventor extends Component {
   createSharesBar() {
     let shares = [];
 
-    if (typeof this.shares[0].percentage == "undefined") {
+    if (typeof this.shares[0].percentage === "undefined") {
       return shares;
     }
     for (var i = 0; i < this.shares.length; i++) {
@@ -256,14 +251,12 @@ class Inventor extends Component {
   }
 
   downloadPdf(ipfsFileHash) {
-    {
-      this.ipfsApi.get(ipfsFileHash, function(err, files) {
-        files.forEach(file => {
-          console.log(file.path);
-          console.log(file.content.toString("utf8"));
-        });
+    this.ipfsApi.get(ipfsFileHash, function(err, files) {
+      files.forEach(file => {
+        console.log(file.path);
+        console.log(file.content.toString("utf8"));
       });
-    }
+    });
   }
 
   render() {

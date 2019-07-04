@@ -2,10 +2,6 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 
 class SalaryProposal extends Component {
-  constructor(props) {
-    super(props);
-  }
-
   render() {
     var events = this.props.events;
     var lastProposal = events[events.length - 1];

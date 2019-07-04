@@ -1,14 +1,9 @@
-import React, {
-  Component
-} from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 
-import {
-  getContract
-} from "./../../../utils/MyContracts.js";
+import { getContract } from "./../../../utils/MyContracts.js";
 
 const ipfsAPI = require("ipfs-api");
-const pdfjsLib = require("pdfjs-dist");
 
 class AddContribution extends Component {
   constructor(props) {
@@ -83,8 +78,6 @@ class AddContribution extends Component {
       account = result[0];
     });
 
-    var inventorAddr = self.state.value;
-
     getContract(this.context.drizzle)
       .then(function(instance) {
         console.log("Sending filehash to contract...");
@@ -96,9 +89,9 @@ class AddContribution extends Component {
       .then(function(result) {
         alert(
           "Contribution added successfully! Transaction Hash: " +
-          result.tx +
-          "\nIpfs File Hash: " +
-          ipfsId
+            result.tx +
+            "\nIpfs File Hash: " +
+            ipfsId
         );
         console.log(result);
       })
@@ -112,38 +105,24 @@ class AddContribution extends Component {
   }
 
   render() {
-    return ( <
-      div className = "form-group" >
-      <
-      form id = "captureMedia"
-      onSubmit = {
-        this.handleSubmit
-      } >
-      <
-      input type = "file"
-      onChange = {
-        this.captureFile
-      }
-      /> <
-      /form> <
-      label onChange = {
-        this.handleChange
-      }
-      htmlFor = "ipfsHash" > {
-        this.state.added_file_hash
-      } < /label>
-
-      <
-      p / >
-      <
-      button type = "button"
-      className = "form-control btn btn-primary"
-      onClick = {
-        this.onClick
-      } >
-      Send <
-      /button> <
-      /div>
+    return (
+      <div className="form-group">
+        <form id="captureMedia" onSubmit={this.handleSubmit}>
+          <input type="file" onChange={this.captureFile} />{" "}
+        </form>{" "}
+        <label onChange={this.handleChange} htmlFor="ipfsHash">
+          {" "}
+          {this.state.added_file_hash}{" "}
+        </label>
+        <p />
+        <button
+          type="button"
+          className="form-control btn btn-primary"
+          onClick={this.onClick}
+        >
+          Send{" "}
+        </button>{" "}
+      </div>
     );
   }
 }

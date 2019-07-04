@@ -2,10 +2,6 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 
 class SharesProposal extends Component {
-  constructor(props) {
-    super(props);
-  }
-
   getInventor() {
     if (this.props.shares[0]) {
       return this.props.shares[0].proposingInventor;

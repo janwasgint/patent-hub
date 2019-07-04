@@ -3,10 +3,6 @@ import PropTypes from "prop-types";
 import Blockies from "react-blockies";
 
 class ContributionList extends Component {
-  constructor(props) {
-    super(props);
-  }
-
   render() {
     const props = this.props;
     return (
