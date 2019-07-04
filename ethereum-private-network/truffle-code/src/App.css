@@ -21,6 +21,8 @@ code {
   background: #eee;
 }
 
+.progress {height: 25px;}
+
 .container {
   box-sizing: border-box;
   width: calc(100% - 40px);
