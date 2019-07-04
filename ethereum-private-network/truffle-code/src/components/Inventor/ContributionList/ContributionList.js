@@ -11,23 +11,25 @@ class ContributionList extends Component {
     const props = this.props;
     return (
       <div>
-        <ul className="list-unstyled">
-          {this.props.events.map(function(event, i) {
-            console.log(props);
-            return (
-              <li className="media" key={i}>
-                <Blockies seed={event.inventor} size={10} scale={10} />
-                <div className="media-body">
-                  <h5 className="m-3">
-                    {props.mapNameToAddress(event.inventor)}{" "}
-                    <h6>{event.inventor}</h6>
-                  </h5>
-                  <p className="m-3">File hash: {event.ipfsFileHash}</p>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
+        {this.props.events && this.props.events.length ? (
+          <ul className="list-unstyled">
+            {this.props.events.map(function(event, i) {
+              return (
+                <li className="media" key={i}>
+                  <Blockies seed={event.inventor} size={10} scale={10} />
+                  <div className="media-body">
+                    <h5 className="m-3">
+                      {props.mapNameToAddress(event.inventor)}: {event.inventor}
+                    </h5>
+                    <p className="m-3">File hash: {event.ipfsFileHash}</p>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        ) : (
+          <div>Nothing has been contributed</div>
+        )}
       </div>
     );
   }

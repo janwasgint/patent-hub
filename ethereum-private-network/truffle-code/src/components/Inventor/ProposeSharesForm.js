@@ -45,7 +45,6 @@ class ProposeSharesForm extends Component {
   }
 
   render() {
-    console.log("props:", this.props);
     return (
       <div>
         <form onSubmit={this.handleSubmit}>
