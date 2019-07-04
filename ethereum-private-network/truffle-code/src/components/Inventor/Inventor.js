@@ -16,7 +16,6 @@ class Inventor extends Component {
   constructor(props) {
     super(props);
 
-    console.log("InventorProps:", props);
     this.ipfsApi = ipfsAPI("localhost", 5001, "https");
 
     this.showNewProposalForm = this.showNewProposalForm.bind(this);
@@ -36,7 +35,7 @@ class Inventor extends Component {
       participantRegistered: [],
       contributionAddedSuccessfully: [],
       sharesProposalSubmitted: [],
-      salaryProposalSubmitted: []
+      approvePatentAgentContractRequest: []
     };
 
     // fetch all events we have to listen to from the contract
@@ -101,6 +100,16 @@ class Inventor extends Component {
       /*console.log(
         "Contributions: " + this.events.contributionAddedSuccessfully
       );*/
+
+      for (var i = 0; i < propsEvents.length; i++) {
+        if (propsEvents[i].event === "approvePatentAgentContractRequest") {
+          this.events.approvePatentAgentContractRequest.push({
+            patentAgent: propsEvents[i].returnValues.patentAgent,
+            ipfsFileHash: propsEvents[i].returnValues.ipfsFileHash,
+            payment: propsEvents[i].returnValues.payment
+          });
+        }
+      }
     }
   }
 
@@ -129,8 +138,6 @@ class Inventor extends Component {
 
   acceptSharesProposal() {
     {
-      console.log("accepted");
-
       var account = "";
       this.context.drizzle.web3.eth.getAccounts(function(error, result) {
         if (error != null) console.log("Could not get accounts!");
@@ -184,18 +191,8 @@ class Inventor extends Component {
         return parseInt(inventor[2]);
       });
 
-      // get proposed shares
-      var shares = [];
-      for (var i = 0; i < this.events.participantRegistered.length; i++) {
-        if (this.events.participantRegistered[i].role == "Inventor") {
-          shares.push(50);
-        }
-      }
-      console.log("Proposed shares: " + inventorShares);
-
       var inventors = this.inventors;
 
-      // Here for Korbi
       var account = "";
       this.context.drizzle.web3.eth.getAccounts(function(error, result) {
         if (error != null) console.log("Could not get accounts!");
@@ -324,12 +321,14 @@ class Inventor extends Component {
         <p />
 
         <div className="card">
-          <h5 className="card-header"> Salary Proposal </h5>
+          <h5 className="card-header"> Contract Proposal </h5>
           <div className="card-body">
             <SalaryProposal
-              events={this.events.salaryProposalSubmitted}
+              events={this.events.approvePatentAgentContractRequest}
               acceptPaymentProposal={this.acceptPaymentProposal}
               rejectPaymentProposal={this.rejectPaymentProposal}
+              mapNameToAddress={address => this.mapNameToAddress(address)}
+              downloadPdf={this.downloadPdf}
             />
           </div>
         </div>

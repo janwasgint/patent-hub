@@ -7,16 +7,29 @@ class SalaryProposal extends Component {
   }
 
   render() {
+    var events = this.props.events;
+    var lastProposal = events[events.length - 1];
     return (
       <div>
         {this.props.events && this.props.events.length ? (
           <div>
             <h5 className="card-title">
-              PatentAgentX proposed the following salary:
+              Patent Agent{" "}
+              {this.props.mapNameToAddress(lastProposal.patentAgent)} proposed
+              the following contract and payment:
             </h5>
             <div className="alert alert-dark" role="alert">
               {" "}
-              Gimme $$$
+              <h5>Payment {lastProposal.payment} €</h5>
+              <button
+                type="button"
+                className="form-control btn btn-secondary"
+                onClick={() =>
+                  this.props.downloadPdf(lastProposal.ipfsFileHash)
+                }
+              >
+                Download Contract
+              </button>
             </div>
             <p />
             <form>
@@ -43,7 +56,7 @@ class SalaryProposal extends Component {
             </form>
           </div>
         ) : (
-          <div>No salary proposal has been submitted</div>
+          <div>No salary has been proposed</div>
         )}
       </div>
     );
