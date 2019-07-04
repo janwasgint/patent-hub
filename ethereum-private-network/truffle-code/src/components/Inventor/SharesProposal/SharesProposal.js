@@ -6,11 +6,17 @@ class SharesProposal extends Component {
     super(props);
   }
 
+  getInventor() {
+    return this.props.shares[0].proposingInventor;
+  }
+
   render() {
+    var inventorAddress = this.getInventor();
     return (
       <div>
         <h5 className="card-title">
-          InventorXYZ proposed the following share of contributions:
+          {this.props.mapNameToAddress(inventorAddress)} proposed the following
+          share of contributions:
         </h5>
 
         <div className="progress"> {this.props.createSharesBar()} </div>

@@ -8,15 +8,20 @@ class ContributionList extends Component {
   }
 
   render() {
+    const props = this.props;
     return (
       <div>
         <ul className="list-unstyled">
           {this.props.events.map(function(event, i) {
+            console.log(props);
             return (
               <li className="media" key={i}>
                 <Blockies seed={event.inventor} size={10} scale={10} />
                 <div className="media-body">
-                  <h5 className="m-3">Inventor: {event.inventor}</h5>
+                  <h5 className="m-3">
+                    {props.mapNameToAddress(event.inventor)}{" "}
+                    <h6>{event.inventor}</h6>
+                  </h5>
                   <p className="m-3">File hash: {event.ipfsFileHash}</p>
                 </div>
               </li>

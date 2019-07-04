@@ -7,6 +7,7 @@ import AddContributionContainer from "./AddContribution/AddContributionContainer
 import ProposeSharesForm from "./ProposeSharesForm";
 import ContributionList from "./ContributionList/ContributionList";
 import SharesProposal from "./SharesProposal/SharesProposal";
+import SalaryProposal from "./SalaryProposal/SalaryProposal";
 
 const ipfsAPI = require("ipfs-api");
 const pdfjsLib = require("pdfjs-dist");
@@ -52,7 +53,7 @@ class Inventor extends Component {
           });
         }
       }
-      console.log("Participants: " + this.events.participantRegistered);
+      //console.log("Participants: " + this.events.participantRegistered);
 
       // get inventors
       this.inventors = [];
@@ -61,7 +62,6 @@ class Inventor extends Component {
           this.inventors.push(this.events.participantRegistered[i].participant);
         }
       }
-      console.log(this.inventors);
 
       //console.log(propsEvents);
       // iterate all events to get the one we are interested in - sharesProposalSubmitted(address indexed proposingInventor, address indexed shareHolder, uint percentage);
@@ -75,7 +75,7 @@ class Inventor extends Component {
           });
         }
       }
-      console.log("Shares: " + this.events.sharesProposalSubmitted);
+      //console.log("Shares: " + this.events.sharesProposalSubmitted);
 
       this.shares = [];
       for (
@@ -86,7 +86,6 @@ class Inventor extends Component {
         this.shares.push(this.events.sharesProposalSubmitted[i]);
       }
 
-      console.log(this.shares);
       // iterate all events to get the one we are interested in - contributionAddedSuccessfully(address indexed inventor, string ipfsFileHash)
       // for events parameteres see PatentHub.sol
       for (var i = 0; i < propsEvents.length; i++) {
@@ -97,9 +96,9 @@ class Inventor extends Component {
           });
         }
       }
-      console.log(
+      /*console.log(
         "Contributions: " + this.events.contributionAddedSuccessfully
-      );
+      );*/
     }
   }
 
@@ -115,7 +114,7 @@ class Inventor extends Component {
     ["Korbi", "0xc33a1d62e6de00d4c9b135718280411101bcb9dd"]
   ];
 
-  names = [
+  inventorAndAddress = [
     { address: "0x5764e7337dfae66f5ac5551ebb77307709fb0219", name: "Jan" },
     { address: "0x11c2e86ebecf701c265f6d19036ec90d277dd2b3", name: "Luca" },
     { address: "0xc33a1d62e6de00d4c9b135718280411101bcb9dd", name: "Korbi" },
@@ -193,8 +192,6 @@ class Inventor extends Component {
       console.log("Proposed shares: " + inventorShares);
 
       var inventors = this.inventors;
-      console.log("real Inventors:", inventors);
-      console.log("Inventors....", inventorShares, inventorAdresses);
 
       // Here for Korbi
       var account = "";
@@ -205,8 +202,6 @@ class Inventor extends Component {
       // function addSharesProposal(address[] memory inventors, uint[] memory percentages) public onlyInventor() {
       getContract(this.context.drizzle)
         .then(function(instance) {
-          console.log("Inventors....", inventorShares, inventorAdresses);
-
           return instance.addSharesProposal(inventorAdresses, inventorShares, {
             from: account
           });
@@ -221,9 +216,9 @@ class Inventor extends Component {
     }
   }
 
-  mapAddressToName(address) {
+  mapNameToAddress(address) {
     var inventorName;
-    this.names.forEach(inventor => {
+    this.inventorAndAddress.forEach(inventor => {
       if (inventor.address.toUpperCase() == address.toUpperCase()) {
         inventorName = inventor.name;
       }
@@ -249,7 +244,7 @@ class Inventor extends Component {
           aria-valuemax="100"
           key={i}
         >
-          {this.mapAddressToName(this.shares[i].shareHolder)}:{" "}
+          {this.mapNameToAddress(this.shares[i].shareHolder)}:{" "}
           {this.shares[i].percentage}
         </div>
       );
@@ -302,6 +297,7 @@ class Inventor extends Component {
             <ContributionList
               events={this.events.contributionAddedSuccessfully}
               downloadPdf={this.downloadPdf}
+              mapNameToAddress={address => this.mapNameToAddress(address)}
             />
           </div>
         </div>
@@ -317,47 +313,20 @@ class Inventor extends Component {
               showNewProposalForm={this.showNewProposalForm}
               showNewProposal={this.state.showNewProposal}
               createSharesBar={this.createSharesBar}
+              shares={this.shares}
+              mapNameToAddress={address => this.mapNameToAddress(address)}
             />
           </div>
         </div>
-        {/*
-  <p />
 
-  <div className="card" >
-    <h5 className="card-header" > Salary Proposal < /h5>
-      < div className = "card-body" >
-        <h5 className="card-title" >
-          PatentAgentX proposed the following salary:
-</h5>
-  < div className = "alert alert-dark" role = "alert" >
-    { " "}
-Gimme $$$
-  < /div>
-  < p />
-  <form>
-  <div className="row" >
-    <div className="col" >
-      <button
-                    type="button"
-className = "form-control btn btn-success"
-onClick = { this.acceptPaymentProposal }
-  >
-  Accept
-  < /button>
-  < /div>
-  < div className = "col" >
-    <button
-                    type="button"
-className = "form-control btn btn-danger"
-onClick = { this.rejectPaymentProposal }
-  >
-  Reject
-  < /button>
-  < /div>
-  < /div>
-  < /form>
-  < /div>
-    < /div>*/}
+        <p />
+
+        <div className="card">
+          <h5 className="card-header"> Salary Proposal </h5>
+          <div className="card-body">
+            <SalaryProposal />
+          </div>
+        </div>
       </div>
     );
   }
