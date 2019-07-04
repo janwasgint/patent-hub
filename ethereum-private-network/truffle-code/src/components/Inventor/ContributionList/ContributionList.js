@@ -2,11 +2,6 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Blockies from "react-blockies";
 
-import { getContract } from "./../../../utils/MyContracts.js";
-
-const ipfsAPI = require("ipfs-api");
-const pdfjsLib = require("pdfjs-dist");
-
 class ContributionList extends Component {
   constructor(props) {
     super(props);

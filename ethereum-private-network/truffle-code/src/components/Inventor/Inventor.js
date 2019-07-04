@@ -6,6 +6,7 @@ import { getContract } from "../../utils/MyContracts.js";
 import AddContributionContainer from "./AddContribution/AddContributionContainer";
 import ProposeSharesForm from "./ProposeSharesForm";
 import ContributionList from "./ContributionList/ContributionList";
+import SharesProposal from "./SharesProposal/SharesProposal";
 
 const ipfsAPI = require("ipfs-api");
 const pdfjsLib = require("pdfjs-dist");
@@ -114,7 +115,14 @@ class Inventor extends Component {
     ["Korbi", "0xc33a1d62e6de00d4c9b135718280411101bcb9dd"]
   ];
 
-  testSharesProposal = [["A", "33%"], ["InventorXYZ", "50%"], ["D", "17%"]];
+  names = [
+    { address: "0x5764e7337dfae66f5ac5551ebb77307709fb0219", name: "Jan" },
+    { address: "0x11c2e86ebecf701c265f6d19036ec90d277dd2b3", name: "Luca" },
+    { address: "0xc33a1d62e6de00d4c9b135718280411101bcb9dd", name: "Korbi" },
+    { address: "0x01edfe893343e51f89b323c702e21868109bbf1f", name: "Goofy" },
+    { address: "0x298bd2bd1aab49b7a8bb0943ab972bd53b084f09", name: "Donald" },
+    { address: "0x95057ead904141f497cdbad7714b295e12f8c48a", name: "Mickey" }
+  ];
 
   componentDidMount() {}
 
@@ -213,31 +221,40 @@ class Inventor extends Component {
     }
   }
 
+  mapAddressToName(address) {
+    var inventorName;
+    this.names.forEach(inventor => {
+      if (inventor.address.toUpperCase() == address.toUpperCase()) {
+        inventorName = inventor.name;
+      }
+    });
+
+    return inventorName;
+  }
+
   createSharesBar() {
-    {
-      /*
     let shares = [];
-    console.log("shares: ", this.shares)
-    if (typeof this.shares[] == "undefined") {
-      return shares
+
+    if (typeof this.shares[0].percentage == "undefined") {
+      return shares;
     }
     for (var i = 0; i < this.shares.length; i++) {
       shares.push(
         <div
-          className={ this.progressbarColors[i % this.progressbarColors.length] }
-          role = "progressbar"
-          style = {{ width: toString(this.shares[i].percentage) + "%" }}
+          className={this.progressbarColors[i % this.progressbarColors.length]}
+          role="progressbar"
+          style={{ width: this.shares[i].percentage.toString() + "%" }}
           aria-valuenow="0"
           aria-valuemin="0"
           aria-valuemax="100"
-          key = { i }>
-      { this.shares[i].percentage }
-      < /div>
+          key={i}
+        >
+          {this.mapAddressToName(this.shares[i].shareHolder)}:{" "}
+          {this.shares[i].percentage}
+        </div>
       );
-  }
-    return shares;
-    */
     }
+    return shares;
   }
 
   sendFiles() {
@@ -256,20 +273,17 @@ class Inventor extends Component {
   }
 
   render() {
-    {
-      let self = this;
-      const showNewProposal = this.state.showNewProposal;
+    const showNewProposal = this.state.showNewProposal;
 
-      let form = <div />;
-      if (showNewProposal) {
-        form = (
-          <ProposeSharesForm
-            inventors={this.testInventors}
-            hide={() => this.hideNewProposalForm()}
-            propose={this.proposeNewSharesDistribution}
-          />
-        );
-      }
+    let form = <div />;
+    if (showNewProposal) {
+      form = (
+        <ProposeSharesForm
+          inventors={this.testInventors}
+          hide={() => this.hideNewProposalForm()}
+          propose={this.proposeNewSharesDistribution}
+        />
+      );
     }
 
     return (
@@ -292,86 +306,21 @@ class Inventor extends Component {
           </div>
         </div>
         <p />
-        {/*
-        < table >
-        <thead>
-        <tr>
-        <th>Inventor < /th>
-        < th > File hash < /th>
-          < /tr>
-          < /thead>
 
-  this.events.contributionAddedSuccessfully.map(function(event, i) {
-    return (
-      <tbody key= { i } >
-      <tr>
-      <td>
-      <Blockies seed={ event.inventor } size = { 10} scale = { 10} />
-        { event.inventor }
-        < /td>
-        < td > { event.ipfsFileHash } < /td>
-        {/*<td>
-        <button className="form-control btn btn-primary" onClick={self.downloadPdf(event.ipfsFileHash)}>
-          Download
-        </button>
-        </td>
-        < /tr>
-        < /tbody>
-                );
-          })}
-          </table>
-          {/*
+        <div className="card">
+          <h5 className="card-header"> Share Proposal </h5>
+          <div className="card-body">
+            <SharesProposal
+              form={form}
+              acceptSharesProposal={this.acceptSharesProposal}
+              rejectShareProposal={this.rejectShareProposal}
+              showNewProposalForm={this.showNewProposalForm}
+              showNewProposal={this.state.showNewProposal}
+              createSharesBar={this.createSharesBar}
+            />
+          </div>
         </div>
-
-        < p />
-
-  <div className="card" >
-    <h5 className="card-header" > Share Proposal < /h5>
-      < div className = "card-body" >
-        <h5 className="card-title" >
-          InventorXYZ proposed the following share of contributions:
-</h5>
-
-  < div className = "progress" > {() => this.createSharesBar() } < /div>
-    < p />
-    <form>
-    <div className="row" >
-      <div className="col" >
-        <button
-                    type="button"
-                    className = "form-control btn btn-success"
-                    disabled = { this.state.showNewProposal }
-onClick = { this.acceptSharesProposal }
-  >
-  Accept
-  </button>
-  </div>
-  < div className = "col" >
-    <button
-                    type="button"
-className = "form-control btn btn-danger"
-disabled = { this.state.showNewProposal }
-onClick = { this.rejectShareProposal }
-  >
-  Reject
-  < /button>
-  < /div>
-  < div className = "col" >
-    <button
-                    type="button"
-className = "form-control btn btn-secondary"
-onClick = { this.showNewProposalForm }
-  >
-  New
-  < /button>
-  < /div>
-  < /div>
-  < /form>
-  < p />
-  { form }
-  < /div>
-  < /div>
-
+        {/*
   <p />
 
   <div className="card" >
