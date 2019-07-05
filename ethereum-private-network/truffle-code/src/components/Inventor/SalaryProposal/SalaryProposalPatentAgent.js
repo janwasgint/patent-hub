@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 
-class SalaryProposal extends Component {
+class SalaryProposalPatentAgent extends Component {
   render() {
     var events = this.props.events;
     var lastProposal = events[events.length - 1];
@@ -10,7 +10,7 @@ class SalaryProposal extends Component {
         {this.props.events && this.props.events.length ? (
           <div>
             <h5 className="card-title">
-              Patent Agent{" "}
+              {this.props.actor}{" "}
               {this.props.mapNameToAddress(lastProposal.patentAgent)} proposed
               the following contract and payment:
             </h5>
@@ -52,15 +52,15 @@ class SalaryProposal extends Component {
             </form>
           </div>
         ) : (
-          <div>No salary has been proposed</div>
+          <div>No contract has been proposed</div>
         )}
       </div>
     );
   }
 }
 
-SalaryProposal.contextTypes = {
+SalaryProposalPatentAgent.contextTypes = {
   drizzle: PropTypes.object
 };
 
-export default SalaryProposal;
+export default SalaryProposalPatentAgent;

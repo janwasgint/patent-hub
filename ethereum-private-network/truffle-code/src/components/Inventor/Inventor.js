@@ -6,7 +6,7 @@ import AddContributionContainer from "./AddContribution/AddContributionContainer
 import ProposeSharesForm from "./ProposeSharesForm";
 import ContributionList from "./ContributionList/ContributionList";
 import SharesProposal from "./SharesProposal/SharesProposal";
-import SalaryProposal from "./SalaryProposal/SalaryProposal";
+import SalaryProposal from "./SalaryProposal/SalaryProposalPatentAgent";
 
 const ipfsAPI = require("ipfs-api");
 
@@ -161,11 +161,11 @@ class Inventor extends Component {
     console.log("accepted");
   }
 
-  rejectSharesProposal() {
+  rejectPaymentProposal() {
     console.log("rejected");
   }
 
-  rejectPaymentProposal() {
+  rejectSharesProposal() {
     console.log("rejected");
   }
 
@@ -322,6 +322,7 @@ class Inventor extends Component {
               rejectPaymentProposal={this.rejectPaymentProposal}
               mapNameToAddress={address => this.mapNameToAddress(address)}
               downloadPdf={this.downloadPdf}
+              actor={"Patent Agent"}
             />
           </div>
         </div>
