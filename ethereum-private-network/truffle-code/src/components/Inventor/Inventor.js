@@ -157,14 +157,17 @@ class Inventor extends Component {
       });
   }
 
+  // @Luca Todo: implement function logic
   acceptPaymentProposal() {
     console.log("accepted");
   }
 
+  // @Luca Todo: implement function logic
   rejectPaymentProposal() {
     console.log("rejected");
   }
 
+  // @Luca Todo: implement function logic
   rejectSharesProposal() {
     console.log("rejected");
   }
