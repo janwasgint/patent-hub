@@ -6,6 +6,9 @@ import Blockies from "react-blockies";
 import HostContainer from "../Host/HostContainer";
 import InventorContainer from "../Inventor/InventorContainer";
 import PatentAgentUIContainer from "../PatentAgent/PatentAgentUIContainer";
+import DrawerUIContainer from "../Drawer/DrawerUIContainer";
+import NationalizerUIContainer from "../Nationalizer/NationalizerUIContainer";
+import TranslatorUIContainer from "../Translator/TranslatorUIContainer";
 
 class Home extends Component {
   constructor(props) {
@@ -170,17 +173,17 @@ class Home extends Component {
             )}
             {this.state.role === "Drawer" && (
               <div>
-                <InventorContainer />
+                <DrawerUIContainer />
               </div>
             )}
             {this.state.role === "Translator" && (
               <div>
-                <InventorContainer />
+                <TranslatorUIContainer />
               </div>
             )}
             {this.state.role === "Nationalizer" && (
               <div>
-                <PatentAgentUIContainer />
+                <NationalizerUIContainer />
               </div>
             )}
             {this.state.role === "Patent Office" && (
