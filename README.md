@@ -34,13 +34,15 @@ docker exec truffle-dev yarn install
 
 `docker exec -it truffle-dev bash` to attach a new terminal to the container.
 
+Run the following commands inside the container:
+
 ```
 ganache-cli -d -h 0.0.0.0 -m "raven shock define wish brown cloth twin win weasel stable tone share"
 
 truffle compile && truffle migrate
 ```
 
-Log in to MetaMask and restore the account with the seed phrase.
+Log in to MetaMask and restore the account with the seed phrase.\n
 Change privacy settings: Settings -> Security & Privacy -> Untoggle Privacy mode
 
 `yarn start` and type *http://localhost:3000/* in your browser to connect.
