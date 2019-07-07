@@ -61,7 +61,7 @@ Inventor3:    0xc33a1d62e6de00d4c9b135718280411101bcb9dd (~100 ETH)
 Patent Agent: 0x01edfe893343e51f89b323c702e21868109bbf1f (~100 ETH)  
 Drawer:       0x298bd2bd1aab49b7a8bb0943ab972bd53b084f09 (~100 ETH)  
 Nationalizer: 0x95057ead904141f497cdbad7714b295e12f8c48a (~100 ETH)  
-Patent Agent: 0xf11e2da93e64f102016b44bab37d1166a497cf8a (~100 ETH)  
+Patent Office: 0xf11e2da93e64f102016b44bab37d1166a497cf8a (~100 ETH)  
 
 Unregistered: 0x9956e0c61ba9051595316edf19dd5e699ca0fa91 (~100 ETH)  
 Unregistered: 0xec6b9b45b15289c572a6cbbf572d5e4e5bd30c97 (~100 ETH)  
@@ -81,9 +81,9 @@ docker stop truffle-dev
 ## Uninstall
 
 ```
-docker rm ipfs-node 
+docker rm ipfs-node
 
-docker rm truffle-dev 
+docker rm truffle-dev
 
 docker network rm blc-dev-env
 ```

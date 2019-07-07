@@ -129,7 +129,6 @@ class Home extends Component {
   }
 
   render() {
-    console.log("Roles", actorsAndRoles);
     if (this.state.role === undefined) {
       return <span>Loading...</span>;
     }
@@ -154,7 +153,7 @@ class Home extends Component {
             </div>
           </div>
           <div className="pure-u-1-1">
-            {role === "Unregistered" && (
+            {typeof role == "undefined" && (
               <div>
                 <p>
                   <strong>I am not registered!</strong>
