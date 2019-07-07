@@ -11,8 +11,8 @@ class SalaryProposal extends Component {
           <div>
             <h5 className="card-title">
               {this.props.actor}{" "}
-              {this.props.mapNameToAddress(lastProposal.proposer)} proposed
-              the following payment and contract:
+              {this.props.mapNameToAddress(lastProposal.proposer)} proposed the
+              following payment and contract:
             </h5>
             <div className="alert alert-dark" role="alert">
               {" "}
@@ -30,7 +30,7 @@ class SalaryProposal extends Component {
 
             <p />
 
-            {this.props.showAcceptProposal &&
+            {this.props.showAcceptProposal && (
               <form>
                 <div className="row">
                   <div className="col">
@@ -53,7 +53,14 @@ class SalaryProposal extends Component {
                   </div>
                 </div>
               </form>
-            }
+            )}
+            {!this.props.showAcceptProposal && (
+              <div>
+                <div className="alert alert-success" role="alert">
+                  Contract and salary proposal has been accepted.
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           <div>No contract has been proposed yet!</div>

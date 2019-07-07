@@ -9,10 +9,7 @@ class FeeProposal extends Component {
       <div>
         {this.props.events && this.props.events.length ? (
           <div>
-            <h5 className="card-title">
-              {this.props.actor}{" "}
-              Fee:
-            </h5>
+            <h5 className="card-title">{this.props.actor} Fee:</h5>
             <div className="alert alert-dark" role="alert">
               {" "}
               <h5>Payment {lastProposal.payment} €</h5>
@@ -20,7 +17,7 @@ class FeeProposal extends Component {
 
             <p />
 
-            {this.props.showAcceptFee &&
+            {this.props.showAcceptFee && (
               <form>
                 <div className="row">
                   <button
@@ -32,8 +29,14 @@ class FeeProposal extends Component {
                   </button>
                 </div>
               </form>
-            }
-          
+            )}
+            {!this.props.showAcceptFee && (
+              <div>
+                <div className="alert alert-success" role="alert">
+                  Fee proposal has been accepted.
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           <div>No Patent Office fee to pay yet!</div>

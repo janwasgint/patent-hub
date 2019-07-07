@@ -10,7 +10,6 @@ import ContributionList from "./ContributionList/ContributionList";
 import SharesProposal from "./SharesProposal/SharesProposal";
 import SalaryProposal from "./SalaryProposal/SalaryProposal";
 
-
 class Inventor extends Component {
   constructor(props) {
     super(props);
@@ -18,12 +17,18 @@ class Inventor extends Component {
     this.showNewProposalForm = this.showNewProposalForm.bind(this);
     this.hideNewProposalForm = this.hideNewProposalForm.bind(this);
     this.acceptPaymentProposal = this.acceptPaymentProposal.bind(this);
-    this.proposeNewSharesDistribution = this.proposeNewSharesDistribution.bind(this);
+    this.proposeNewSharesDistribution = this.proposeNewSharesDistribution.bind(
+      this
+    );
     this.createSharesBar = this.createSharesBar.bind(this);
     this.acceptSharesProposal = this.acceptSharesProposal.bind(this);
     this.downloadPdf = this.downloadPdf.bind(this);
 
-    this.state = { showNewProposal: false, showAcceptProposal: true, showAcceptContract: true };
+    this.state = {
+      showNewProposal: false,
+      showAcceptProposal: true,
+      showAcceptContract: true
+    };
 
     // local copy of the events we are interested in
     this.events = {
@@ -32,7 +37,7 @@ class Inventor extends Component {
       sharesProposalSubmitted: [],
       contributionPhaseFinished: [],
       approvePatentAgentContractRequest: [],
-      patentAgentInventorsContractApproved: [],
+      patentAgentInventorsContractApproved: []
     };
 
     // fetch all events we have to listen to from the contract
@@ -54,7 +59,10 @@ class Inventor extends Component {
     this.inventors = [];
     for (var i = 0; i < this.events.participantRegistered.length; i++) {
       if (this.events.participantRegistered[i].role == "Inventor") {
-        this.inventors.push([mapNameToAddress(this.events.participantRegistered[i].participant), this.events.participantRegistered[i].participant]);
+        this.inventors.push([
+          mapNameToAddress(this.events.participantRegistered[i].participant),
+          this.events.participantRegistered[i].participant
+        ]);
       }
     }
 
@@ -89,11 +97,11 @@ class Inventor extends Component {
         });
       }
     }
-  
+
     for (var i = 0; i < propsEvents.length; i++) {
       if (propsEvents[i].event === "contributionPhaseFinished") {
         this.events.contributionPhaseFinished.push({
-          status: true,
+          status: true
         });
         this.state.showAcceptProposal = false;
       }
@@ -112,7 +120,7 @@ class Inventor extends Component {
     for (var i = 0; i < propsEvents.length; i++) {
       if (propsEvents[i].event === "patentAgentInventorsContractApproved") {
         this.events.patentAgentInventorsContractApproved.push({
-          status: true,
+          status: true
         });
         this.state.showAcceptContract = false;
       }
@@ -165,12 +173,15 @@ class Inventor extends Component {
         });
       })
       .then(function(result) {
-        alert("Contract and payment approved successfully! Transaction Hash: " + result.tx);
+        alert(
+          "Contract and payment approved successfully! Transaction Hash: " +
+            result.tx
+        );
         console.log(result);
       })
       .catch(function(err) {
         console.log(err.message);
-      });    
+      });
   }
 
   // Not implemented in the contract yet
@@ -226,7 +237,7 @@ class Inventor extends Component {
     "progress-bar bg-info",
     "progress-bar"
   ];
-  
+
   createSharesBar() {
     let shares = [];
 
@@ -245,7 +256,7 @@ class Inventor extends Component {
           key={i}
         >
           {mapNameToAddress(this.shares[i].shareHolder)}:{" "}
-          {this.shares[i].percentage}
+          {this.shares[i].percentage}%
         </div>
       );
     }

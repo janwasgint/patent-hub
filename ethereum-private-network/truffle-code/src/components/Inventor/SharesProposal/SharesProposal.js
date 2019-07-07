@@ -20,7 +20,7 @@ class SharesProposal extends Component {
             onClick={this.props.showNewProposalForm}
           >
             New Proposal
-          </button>     
+          </button>
           <p />
           {this.props.form}
         </div>
@@ -32,10 +32,9 @@ class SharesProposal extends Component {
             {this.props.mapNameToAddress(inventorAddress)} proposed the
             following shares of contributions:
           </h5>
-
           <div className="progress"> {this.props.createSharesBar()} </div>
           <p />
-          {this.props.showAcceptProposal &&
+          {this.props.showAcceptProposal && (
             <form>
               <div className="row">
                 <div className="col">
@@ -58,7 +57,7 @@ class SharesProposal extends Component {
                     Reject
                   </button>
                 </div>
-                
+
                 <div className="col">
                   <button
                     type="button"
@@ -70,7 +69,14 @@ class SharesProposal extends Component {
                 </div>
               </div>
             </form>
-          }
+          )}
+          {!this.props.showAcceptProposal && (
+            <div>
+              <div className="alert alert-success" role="alert">
+                All inventors accepted the shares proposal
+              </div>
+            </div>
+          )}
           <p />
           {this.props.form}
         </div>

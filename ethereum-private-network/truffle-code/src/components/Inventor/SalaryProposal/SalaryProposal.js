@@ -28,7 +28,7 @@ class SalaryProposal extends Component {
               </button>
             </div>
             <p />
-            {this.props.showAcceptContract &&
+            {this.props.showAcceptContract && (
               <form>
                 <div className="row">
                   <div className="col">
@@ -51,7 +51,14 @@ class SalaryProposal extends Component {
                   </div>
                 </div>
               </form>
-          }
+            )}
+            {!this.props.showAcceptContract && (
+              <div>
+                <div className="alert alert-success" role="alert">
+                  All inventors accepted the contract and salary proposal.
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           <div>No contract has been proposed yet!</div>
