@@ -51,8 +51,8 @@ Change privacy settings: Settings -> Security & Privacy -> Untoggle Privacy mode
 
 ## Available accounts
 
-Host: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0x4a927d1c6bc92a672b9fa81d898cafbc775ec8bf (~100 ETH)  
-Inventor 1:    0x5764e7337dfae66f5ac5551ebb77307709fb0219 (~100 ETH)  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Host: 0x4a927d1c6bc92a672b9fa81d898cafbc775ec8bf (~100 ETH)  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Inventor 1: 0x5764e7337dfae66f5ac5551ebb77307709fb0219 (~100 ETH)  
 Inventor 2:    0x11c2e86ebecf701c265f6d19036ec90d277dd2b3 (~100 ETH)  
 Inventor 3:    0xc33a1d62e6de00d4c9b135718280411101bcb9dd (~100 ETH)  
 Patent Agent:  0x01edfe893343e51f89b323c702e21868109bbf1f (~100 ETH)  
