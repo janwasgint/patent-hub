@@ -194,7 +194,7 @@ class SharesProposal extends Component {
           {!this.props.showAcceptProposal && (
             <div>
               <div className="alert alert-success" role="alert">
-                All inventors accepted the shares proposal
+                All inventors accepted the shares proposal.
               </div>
             </div>
           )}
