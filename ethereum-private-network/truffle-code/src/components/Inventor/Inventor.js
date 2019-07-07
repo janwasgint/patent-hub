@@ -20,7 +20,6 @@ class Inventor extends Component {
     this.proposeNewSharesDistribution = this.proposeNewSharesDistribution.bind(
       this
     );
-    this.createSharesBar = this.createSharesBar.bind(this);
     this.acceptSharesProposal = this.acceptSharesProposal.bind(this);
     this.downloadPdf = this.downloadPdf.bind(this);
 
@@ -33,7 +32,6 @@ class Inventor extends Component {
     // local copy of the events we are interested in
     this.events = {
       participantRegistered: [],
-      sharesProposalSubmitted: [],
       contributionPhaseFinished: [],
       patentAgentInventorsContractApproved: []
     };
@@ -62,27 +60,6 @@ class Inventor extends Component {
           this.events.participantRegistered[i].participant
         ]);
       }
-    }
-
-    // iterate all events to get the one we are interested in - sharesProposalSubmitted(address indexed proposingInventor, address indexed shareHolder, uint percentage);
-    // for events parameters see PatentHub.sol
-    for (var i = 0; i < propsEvents.length; i++) {
-      if (propsEvents[i].event === "sharesProposalSubmitted") {
-        this.events.sharesProposalSubmitted.push({
-          proposingInventor: propsEvents[i].returnValues.proposingInventor,
-          shareHolder: propsEvents[i].returnValues.shareHolder,
-          percentage: propsEvents[i].returnValues.percentage
-        });
-      }
-    }
-
-    this.shares = [];
-    for (
-      var i = this.events.sharesProposalSubmitted.length - 1;
-      i >= this.events.sharesProposalSubmitted.length - this.inventors.length;
-      i--
-    ) {
-      this.shares.push(this.events.sharesProposalSubmitted[i]);
     }
 
     for (var i = 0; i < propsEvents.length; i++) {
@@ -181,7 +158,7 @@ class Inventor extends Component {
     this.setState({ showNewProposal: false });
   }
 
-  proposeNewSharesDistribution(testInventors) {
+  proposeNewSharesDistribution(testInventors, self) {
     let inventorAdresses = testInventors.map(inventor => {
       return inventor[1];
     });
@@ -197,49 +174,19 @@ class Inventor extends Component {
     });
     // function addSharesProposal(address[] memory inventors, uint[] memory percentages) public onlyInventor() {
     getContract(this.context.drizzle)
-      .then(function(instance) {
+      .then(instance => {
         return instance.addSharesProposal(inventorAdresses, inventorShares, {
           from: account
         });
       })
-      .then(function(result) {
+      .then(result => {
         alert("Shares proposed successfully! Transaction Hash: " + result.tx);
         console.log(result);
+        this.setState({ showNewProposal: false });
       })
       .catch(function(err) {
         console.log(err.message);
       });
-  }
-
-  progressbarColors = [
-    "progress-bar bg-warning",
-    "progress-bar bg-info",
-    "progress-bar"
-  ];
-
-  createSharesBar() {
-    let shares = [];
-
-    if (typeof this.shares[0].percentage === "undefined") {
-      return shares;
-    }
-    for (var i = 0; i < this.shares.length; i++) {
-      shares.push(
-        <div
-          className={this.progressbarColors[i % this.progressbarColors.length]}
-          role="progressbar"
-          style={{ width: this.shares[i].percentage.toString() + "%" }}
-          aria-valuenow="0"
-          aria-valuemin="0"
-          aria-valuemax="100"
-          key={i}
-        >
-          {mapNameToAddress(this.shares[i].shareHolder)}:{" "}
-          {this.shares[i].percentage}%
-        </div>
-      );
-    }
-    return shares;
   }
 
   render() {
@@ -282,14 +229,14 @@ class Inventor extends Component {
           <h5 className="card-header"> Share Proposal </h5>
           <div className="card-body">
             <SharesProposal
+              propsEvents={this.props.PatentHub.events}
               form={form}
               acceptSharesProposal={this.acceptSharesProposal}
               rejectShareProposal={this.rejectShareProposal}
               showNewProposalForm={this.showNewProposalForm}
               showNewProposal={this.state.showNewProposal}
               showAcceptProposal={this.state.showAcceptProposal}
-              createSharesBar={this.createSharesBar}
-              shares={this.shares}
+              inventors={this.inventors}
               mapNameToAddress={address => mapNameToAddress(address)}
             />
           </div>

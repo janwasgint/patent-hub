@@ -30,17 +30,13 @@ class SalaryProposal extends Component {
     ) {
       this.state.approvePatentAgentContractRequest = tempApprovePatentAgentContractRequest;
     }
-    console.log("tempApproved", tempApprovePatentAgentContractRequest);
   }
 
   render() {
     this.fetchPatentAgentApprovals();
 
-    console.log("stateApproved", this.state.approvePatentAgentContractRequest);
-
     var events = this.state.approvePatentAgentContractRequest;
     var lastProposal = events[events.length - 1];
-    console.log("last", lastProposal);
 
     return (
       <div>
