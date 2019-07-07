@@ -3,13 +3,47 @@ import PropTypes from "prop-types";
 import Blockies from "react-blockies";
 
 class ContributionList extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = { contributionAddedSuccessfully: [] };
+
+    this.fetchContribution();
+  }
+
+  fetchContribution() {
+    var propsEvents = this.props.propsEvents;
+    var tempContributionAddedSuccessfully = [];
+
+    // iterate all events to get the one we are interested in - contributionAddedSuccessfully(address indexed inventor, string ipfsFileHash)
+    // for events parameteres see PatentHub.sol
+    for (var i = 0; i < propsEvents.length; i++) {
+      if (propsEvents[i].event === "contributionAddedSuccessfully") {
+        tempContributionAddedSuccessfully.push({
+          inventor: propsEvents[i].returnValues.inventor,
+          ipfsFileHash: propsEvents[i].returnValues.ipfsFileHash
+        });
+      }
+    }
+    if (
+      this.state.contributionAddedSuccessfully.length !=
+      tempContributionAddedSuccessfully.length
+    ) {
+      this.state.contributionAddedSuccessfully = tempContributionAddedSuccessfully;
+    }
+  }
+
   render() {
-    const props = this.props;
+    this.fetchContribution();
+
+    let props = this.props;
+
     return (
       <div>
-        {this.props.events && this.props.events.length ? (
+        {this.state.contributionAddedSuccessfully &&
+        this.state.contributionAddedSuccessfully.length ? (
           <ul className="list-unstyled">
-            {this.props.events.map(function(event, i) {
+            {this.state.contributionAddedSuccessfully.map(function(event, i) {
               return (
                 <li className="media align-middle" key={i}>
                   <Blockies seed={event.inventor} size={10} scale={10} />

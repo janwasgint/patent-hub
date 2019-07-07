@@ -33,10 +33,8 @@ class Inventor extends Component {
     // local copy of the events we are interested in
     this.events = {
       participantRegistered: [],
-      contributionAddedSuccessfully: [],
       sharesProposalSubmitted: [],
       contributionPhaseFinished: [],
-      approvePatentAgentContractRequest: [],
       patentAgentInventorsContractApproved: []
     };
 
@@ -87,33 +85,12 @@ class Inventor extends Component {
       this.shares.push(this.events.sharesProposalSubmitted[i]);
     }
 
-    // iterate all events to get the one we are interested in - contributionAddedSuccessfully(address indexed inventor, string ipfsFileHash)
-    // for events parameteres see PatentHub.sol
-    for (var i = 0; i < propsEvents.length; i++) {
-      if (propsEvents[i].event === "contributionAddedSuccessfully") {
-        this.events.contributionAddedSuccessfully.push({
-          inventor: propsEvents[i].returnValues.inventor,
-          ipfsFileHash: propsEvents[i].returnValues.ipfsFileHash
-        });
-      }
-    }
-
     for (var i = 0; i < propsEvents.length; i++) {
       if (propsEvents[i].event === "contributionPhaseFinished") {
         this.events.contributionPhaseFinished.push({
           status: true
         });
         this.state.showAcceptProposal = false;
-      }
-    }
-
-    for (var i = 0; i < propsEvents.length; i++) {
-      if (propsEvents[i].event === "approvePatentAgentContractRequest") {
-        this.events.approvePatentAgentContractRequest.push({
-          patentAgent: propsEvents[i].returnValues.patentAgent,
-          ipfsFileHash: propsEvents[i].returnValues.ipfsFileHash,
-          payment: propsEvents[i].returnValues.payment
-        });
       }
     }
 
@@ -129,8 +106,8 @@ class Inventor extends Component {
 
   getAllEvents() {}
 
-  downloadPdf() {
-    ipfsApi.get(this.state.added_file_hash, function(err, files) {
+  downloadPdf(ipfsFileHash) {
+    ipfsApi.get(ipfsFileHash, function(err, files) {
       files.forEach(file => {
         console.log(file.path);
         console.log(file.content.toString("utf8"));
@@ -266,8 +243,6 @@ class Inventor extends Component {
   }
 
   render() {
-    var events = this.events.contributionAddedSuccessfully;
-
     const showNewProposal = this.state.showNewProposal;
 
     let form = <div />;
@@ -295,7 +270,7 @@ class Inventor extends Component {
           <h5 className="card-header"> Contribution List </h5>
           <div className="card-body">
             <ContributionList
-              events={this.events.contributionAddedSuccessfully}
+              propsEvents={this.props.PatentHub.events}
               downloadPdf={this.downloadPdf}
               mapNameToAddress={address => mapNameToAddress(address)}
             />
@@ -326,7 +301,7 @@ class Inventor extends Component {
           <h5 className="card-header"> Contract Proposal </h5>
           <div className="card-body">
             <SalaryProposal
-              events={this.events.approvePatentAgentContractRequest}
+              propsEvents={this.props.PatentHub.events}
               acceptPaymentProposal={this.acceptPaymentProposal}
               rejectPaymentProposal={this.rejectPaymentProposal}
               showAcceptContract={this.state.showAcceptContract}

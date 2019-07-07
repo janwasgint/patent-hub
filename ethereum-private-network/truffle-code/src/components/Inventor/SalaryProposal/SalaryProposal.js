@@ -2,12 +2,50 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 
 class SalaryProposal extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = { approvePatentAgentContractRequest: [] };
+    this.fetchPatentAgentApprovals();
+  }
+
+  fetchPatentAgentApprovals() {
+    var propsEvents = this.props.propsEvents;
+    var tempApprovePatentAgentContractRequest = [];
+
+    // iterate all events to get the one we are interested in - approvePatentAgentContractRequest(address indexed inventor, string ipfsFileHash)
+    // for events parameteres see PatentHub.sol
+    for (var i = 0; i < propsEvents.length; i++) {
+      if (propsEvents[i].event === "approvePatentAgentContractRequest") {
+        tempApprovePatentAgentContractRequest.push({
+          patentAgent: propsEvents[i].returnValues.patentAgent,
+          ipfsFileHash: propsEvents[i].returnValues.ipfsFileHash,
+          payment: propsEvents[i].returnValues.payment
+        });
+      }
+    }
+    if (
+      this.state.approvePatentAgentContractRequest.length !=
+      tempApprovePatentAgentContractRequest.length
+    ) {
+      this.state.approvePatentAgentContractRequest = tempApprovePatentAgentContractRequest;
+    }
+    console.log("tempApproved", tempApprovePatentAgentContractRequest);
+  }
+
   render() {
-    var events = this.props.events;
+    this.fetchPatentAgentApprovals();
+
+    console.log("stateApproved", this.state.approvePatentAgentContractRequest);
+
+    var events = this.state.approvePatentAgentContractRequest;
     var lastProposal = events[events.length - 1];
+    console.log("last", lastProposal);
+
     return (
       <div>
-        {this.props.events && this.props.events.length ? (
+        {this.state.approvePatentAgentContractRequest &&
+        this.state.approvePatentAgentContractRequest.length ? (
           <div>
             <h5 className="card-title">
               {this.props.actor}{" "}
