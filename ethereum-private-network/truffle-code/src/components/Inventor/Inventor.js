@@ -127,6 +127,8 @@ class Inventor extends Component {
     }
   }
 
+  getAllEvents() {}
+
   downloadPdf() {
     ipfsApi.get(this.state.added_file_hash, function(err, files) {
       files.forEach(file => {
@@ -264,6 +266,8 @@ class Inventor extends Component {
   }
 
   render() {
+    var events = this.events.contributionAddedSuccessfully;
+
     const showNewProposal = this.state.showNewProposal;
 
     let form = <div />;

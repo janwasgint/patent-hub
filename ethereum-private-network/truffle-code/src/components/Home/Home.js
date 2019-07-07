@@ -3,6 +3,8 @@ import { AccountData } from "drizzle-react-components";
 import PropTypes from "prop-types";
 import Blockies from "react-blockies";
 
+import { actorsAndRoles } from "../shared";
+
 import HostContainer from "../Host/HostContainer";
 import InventorContainer from "../Inventor/InventorContainer";
 import PatentAgentContainer from "../PatentAgent/PatentAgentContainer";
@@ -14,7 +16,7 @@ import PatentOfficeContainer from "../PatentOffice/PatentOfficeContainer";
 class Home extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = { account: 0 };
   }
 
   componentDidMount() {
@@ -118,29 +120,30 @@ class Home extends Component {
       role = "Nationalizer";
     } /*else if (translator) {
       role = "Translator";
-    }*/ else if (patentOffice) {
+    }*/ else if (
+      patentOffice
+    ) {
       role = "Patent Office";
     }
     this.setState({ role: role });
   }
 
-  
-
-
   render() {
+    console.log("Roles", actorsAndRoles);
     if (this.state.role === undefined) {
       return <span>Loading...</span>;
     }
 
     var myAddr = this.props.accounts[0];
+    var stringAddress = myAddr;
+    var role = actorsAndRoles[myAddr.toLowerCase()];
 
     return (
       <main className="container">
         <div className="pure-g">
           <div className="pure-u-1-1 header">
             <div className="jumbotron">
-              <h1 className="display-4">{this.state.role}</h1>
-
+              <h1 className="display-4">{role}</h1>
               <hr className="my-4" />
               <p className="lead">
                 <Blockies seed={myAddr} size={10} scale={10} />
@@ -150,46 +153,45 @@ class Home extends Component {
               </p>
             </div>
           </div>
-
           <div className="pure-u-1-1">
-            {this.state.role === "Unregistered" && (
+            {role === "Unregistered" && (
               <div>
                 <p>
                   <strong>I am not registered!</strong>
                 </p>
               </div>
             )}
-            {this.state.role === "Host" && (
+            {role === "Host" && (
               <div>
                 <HostContainer />
               </div>
             )}
-            {this.state.role === "Inventor" && (
+            {role === "Inventor" && (
               <div>
                 <InventorContainer />
               </div>
             )}
-            {this.state.role === "Patent Agent" && (
+            {role === "Patent Agent" && (
               <div>
                 <PatentAgentContainer />
               </div>
             )}
-            {this.state.role === "Drawer" && (
+            {role === "Drawer" && (
               <div>
                 <DrawerContainer />
               </div>
             )}
-            {/*{this.state.role === "Translator" && (
+            {/*{role === "Translator" && (
               <div>
                 <TranslatorContainer />
               </div>
             )}*/}
-            {this.state.role === "Nationalizer" && (
+            {role === "Nationalizer" && (
               <div>
                 <NationalizerContainer />
               </div>
             )}
-            {this.state.role === "Patent Office" && (
+            {role === "Patent Office" && (
               <div>
                 <PatentOfficeContainer />
               </div>
