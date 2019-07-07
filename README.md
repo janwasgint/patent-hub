@@ -42,7 +42,7 @@ ganache-cli -d -h 0.0.0.0 -m "raven shock define wish brown cloth twin win wease
 truffle compile && truffle migrate
 ```
 
-Log in to MetaMask and restore the account with the seed phrase.\n
+Log in to MetaMask and restore the account with the seed phrase.  
 Change privacy settings: Settings -> Security & Privacy -> Untoggle Privacy mode
 
 `yarn start` and type *http://localhost:3000/* in your browser to connect.
