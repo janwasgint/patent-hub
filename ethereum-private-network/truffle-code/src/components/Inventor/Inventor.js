@@ -26,7 +26,9 @@ class Inventor extends Component {
     this.state = {
       showNewProposal: false,
       showAcceptProposal: true,
-      showAcceptContract: true
+      showAcceptContract: true,
+      hasAcceptedShares: false,
+      hasAcceptedSalary: false
     };
 
     // local copy of the events we are interested in
@@ -100,14 +102,15 @@ class Inventor extends Component {
     });
 
     getContract(this.context.drizzle)
-      .then(function(instance) {
+      .then(instance => {
         return instance.approveShare({ from: account });
       })
-      .then(function(result) {
+      .then(result => {
         alert(
           "Shares proposal approved successfully! Transaction Hash: " +
             result.tx
         );
+        this.setState({ hasAcceptedShares: true });
         console.log(result);
       })
       .catch(function(err) {
@@ -123,16 +126,17 @@ class Inventor extends Component {
     });
     // function addSharesProposal(address[] memory inventors, uint[] memory percentages) public onlyInventor() {
     getContract(this.context.drizzle)
-      .then(function(instance) {
+      .then(instance => {
         return instance.approvePatentAgentContract({
           from: account
         });
       })
-      .then(function(result) {
+      .then(result => {
         alert(
           "Contract and payment approved successfully! Transaction Hash: " +
             result.tx
         );
+        this.setState({ hasAcceptedSalaty: true });
         console.log(result);
       })
       .catch(function(err) {
@@ -183,6 +187,7 @@ class Inventor extends Component {
         alert("Shares proposed successfully! Transaction Hash: " + result.tx);
         console.log(result);
         this.setState({ showNewProposal: false });
+        this.setState({ hasAcceptedShares: false });
       })
       .catch(function(err) {
         console.log(err.message);
@@ -231,6 +236,7 @@ class Inventor extends Component {
             <SharesProposal
               propsEvents={this.props.PatentHub.events}
               form={form}
+              hasAcceptedShares={this.state.hasAcceptedShares}
               acceptSharesProposal={this.acceptSharesProposal}
               rejectShareProposal={this.rejectShareProposal}
               showNewProposalForm={this.showNewProposalForm}
@@ -248,6 +254,7 @@ class Inventor extends Component {
           <h5 className="card-header"> Contract Proposal </h5>
           <div className="card-body">
             <SalaryProposal
+              hasAcceptedSalary={this.state.hasAcceptedSalary}
               propsEvents={this.props.PatentHub.events}
               acceptPaymentProposal={this.acceptPaymentProposal}
               rejectPaymentProposal={this.rejectPaymentProposal}

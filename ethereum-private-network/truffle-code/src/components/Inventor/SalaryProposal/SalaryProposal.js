@@ -93,6 +93,15 @@ class SalaryProposal extends Component {
                 </div>
               </div>
             )}
+            {this.props.hasAcceptedSalary && (
+              <div>
+                <p />
+
+                <div className="alert alert-success" role="alert">
+                  You have accepted the contract and salary proposal.
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           <div>No contract has been proposed yet!</div>

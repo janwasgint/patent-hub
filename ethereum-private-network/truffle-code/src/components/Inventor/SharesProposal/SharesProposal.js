@@ -198,6 +198,15 @@ class SharesProposal extends Component {
               </div>
             </div>
           )}
+          {this.props.hasAcceptedShares && (
+            <div>
+              <p />
+
+              <div className="alert alert-success" role="alert">
+                You have accepted the shares proposal.
+              </div>
+            </div>
+          )}
           <p />
           {this.props.form}
         </div>
