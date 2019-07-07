@@ -1,5 +1,5 @@
-var Helper = artifacts.require('Helper');
+var PatentHub = artifacts.require('PatentHub');
 
 module.exports = function(deployer) {
-  deployer.deploy(Helper);
+  deployer.deploy(PatentHub);
 };

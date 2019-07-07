@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 
 import { getContract } from '../../../../utils/MyContracts.js';
 
-
 class RegisterInventor extends Component {
   constructor(props) {
     super(props);

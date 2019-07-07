@@ -71,13 +71,6 @@ const drizzleOptions = {
         }
       },
       {
-        eventName: 'nationalizedPatentProposalUpdated',
-        eventOptions: {
-          fromBlock: 0,
-          toBlock: 'latest'
-        }
-      },
-      {
         eventName: 'approveContractRequest',
         eventOptions: {
           fromBlock: 0,
@@ -92,7 +85,7 @@ const drizzleOptions = {
         }
       },
       {
-        eventName: 'paymentRequest',
+        eventName: 'feePaid',
         eventOptions: {
           fromBlock: 0,
           toBlock: 'latest'

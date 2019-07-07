@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 
 import { getContract } from '../../../../utils/MyContracts.js';
 
-
 class RegisterPatentOffice extends Component {
   constructor(props) {
     super(props);

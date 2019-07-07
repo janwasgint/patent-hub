@@ -2,7 +2,6 @@ import { drizzleConnect } from 'drizzle-react';
 
 import HostSelect from './HostSelect';
 
-
 // May still need this even with data function to refresh component on updates for this contract.
 const mapStateToProps = (state) => {
   return {

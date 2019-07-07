@@ -4,15 +4,13 @@ import RegisterInventorContainer from './RegisterInventor/RegisterInventorContai
 import RegisterPatentAgentContainer from './RegisterPatentAgent/RegisterPatentAgentContainer';
 import RegisterDrawerContainer from './RegisterDrawer/RegisterDrawerContainer';
 import RegisterNationalizerContainer from './RegisterNationalizer/RegisterNationalizerContainer';
-import RegisterTranslatorContainer from './RegisterTranslator/RegisterTranslatorContainer';
+//import RegisterTranslatorContainer from './RegisterTranslator/RegisterTranslatorContainer';
 import RegisterPatentOfficeContainer from './RegisterPatentOffice/RegisterPatentOfficeContainer';
-
 
 class HostSelect extends Component {
   constructor(props) {
     super(props);
     this.state = { value: 'inventor' };
-
     this.handleChange = this.handleChange.bind(this);
   }
 
@@ -57,14 +55,14 @@ class HostSelect extends Component {
           </div>
         );
         break;
-      case 'translator':
+      {/*case 'translator':
         selectContainer = (
           <div>
             <p>Register Translator</p>
             <RegisterTranslatorContainer />
           </div>
         );
-        break;
+        break;*/}
       case 'patent_office':
         selectContainer = (
           <div>
@@ -83,10 +81,9 @@ class HostSelect extends Component {
           <option value="patent_agent">Patent Agent</option>
           <option value="drawer">Drawer</option>
           <option value="nationalizer">Nationalizer</option>
-          <option value="translator">Translator</option>
+          {/*<option value="translator">Translator</option>*/}
           <option value="patent_office">Patent Office</option>
         </select>
-
         {selectContainer}
       </div>
     );

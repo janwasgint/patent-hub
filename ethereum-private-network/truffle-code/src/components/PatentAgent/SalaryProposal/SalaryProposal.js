@@ -4,18 +4,15 @@ import PropTypes from "prop-types";
 class SalaryProposal extends Component {
   render() {
     var events = this.props.events;
-
-    // TODO GET proposal from Drawer and other third parties
-    // its only [2,2] so the propsal is not "undefined"
-    var lastProposal = [2, 2];
+    var lastProposal = events[events.length - 1];
     return (
       <div>
         {this.props.events && this.props.events.length ? (
           <div>
             <h5 className="card-title">
               {this.props.actor}{" "}
-              {this.props.mapNameToAddress(lastProposal.patentAgent)} proposed
-              the following contract and payment:
+              {this.props.mapNameToAddress(lastProposal.proposer)} proposed
+              the following payment and contract:
             </h5>
             <div className="alert alert-dark" role="alert">
               {" "}
@@ -30,32 +27,36 @@ class SalaryProposal extends Component {
                 Download Contract
               </button>
             </div>
+
             <p />
-            <form>
-              <div className="row">
-                <div className="col">
-                  <button
-                    type="button"
-                    className="form-control btn btn-success"
-                    onClick={this.props.acceptPaymentProposal}
-                  >
-                    Accept
-                  </button>
+
+            {this.props.showAcceptProposal &&
+              <form>
+                <div className="row">
+                  <div className="col">
+                    <button
+                      type="button"
+                      className="form-control btn btn-success"
+                      onClick={this.props.acceptPaymentProposal}
+                    >
+                      Accept
+                    </button>
+                  </div>
+                  <div className="col">
+                    <button
+                      type="button"
+                      className="form-control btn btn-danger"
+                      onClick={this.props.rejectPaymentProposal}
+                    >
+                      Reject
+                    </button>
+                  </div>
                 </div>
-                <div className="col">
-                  <button
-                    type="button"
-                    className="form-control btn btn-danger"
-                    onClick={this.props.rejectPaymentProposal}
-                  >
-                    Reject
-                  </button>
-                </div>
-              </div>
-            </form>
+              </form>
+            }
           </div>
         ) : (
-          <div>No contract has been proposed</div>
+          <div>No contract has been proposed yet!</div>
         )}
       </div>
     );

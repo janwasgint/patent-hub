@@ -3,7 +3,6 @@ import Blockies from 'react-blockies';
 
 import HostSelect from './HostSelect/HostSelectContainer';
 
-
 class Host extends Component {
   constructor(props) {
     super(props);
@@ -17,7 +16,7 @@ class Host extends Component {
 
     // fetch all events we have to listen to from the contract
     let propsEvents = this.props.PatentHub.events;
-    //console.log(propsEvents);
+
     // iterate all events to get the one we are interested in - participantRegistered(address indexed participant, string role)
     // for events parameters see PatentHub.sol
     for (var i = 0; i < propsEvents.length; i++) {

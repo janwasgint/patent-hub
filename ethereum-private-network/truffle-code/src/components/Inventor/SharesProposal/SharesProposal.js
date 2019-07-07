@@ -20,7 +20,7 @@ class SharesProposal extends Component {
             onClick={this.props.showNewProposalForm}
           >
             New Proposal
-          </button>
+          </button>     
           <p />
           {this.props.form}
         </div>
@@ -30,44 +30,47 @@ class SharesProposal extends Component {
         <div>
           <h5 className="card-title">
             {this.props.mapNameToAddress(inventorAddress)} proposed the
-            following share of contributions:
+            following shares of contributions:
           </h5>
 
           <div className="progress"> {this.props.createSharesBar()} </div>
           <p />
-          <form>
-            <div className="row">
-              <div className="col">
-                <button
-                  type="button"
-                  className="form-control btn btn-success"
-                  disabled={this.props.showNewProposal}
-                  onClick={this.props.acceptSharesProposal}
-                >
-                  Accept
-                </button>
+          {this.props.showAcceptProposal &&
+            <form>
+              <div className="row">
+                <div className="col">
+                  <button
+                    type="button"
+                    className="form-control btn btn-success"
+                    disabled={this.props.showNewProposal}
+                    onClick={this.props.acceptSharesProposal}
+                  >
+                    Accept
+                  </button>
+                </div>
+                <div className="col">
+                  <button
+                    type="button"
+                    className="form-control btn btn-danger"
+                    disabled={this.props.showNewProposal}
+                    onClick={this.props.rejectShareProposal}
+                  >
+                    Reject
+                  </button>
+                </div>
+                
+                <div className="col">
+                  <button
+                    type="button"
+                    className="form-control btn btn-secondary"
+                    onClick={this.props.showNewProposalForm}
+                  >
+                    New
+                  </button>
+                </div>
               </div>
-              <div className="col">
-                <button
-                  type="button"
-                  className="form-control btn btn-danger"
-                  disabled={this.props.showNewProposal}
-                  onClick={this.props.rejectShareProposal}
-                >
-                  Reject
-                </button>
-              </div>
-              <div className="col">
-                <button
-                  type="button"
-                  className="form-control btn btn-secondary"
-                  onClick={this.props.showNewProposalForm}
-                >
-                  New
-                </button>
-              </div>
-            </div>
-          </form>
+            </form>
+          }
           <p />
           {this.props.form}
         </div>

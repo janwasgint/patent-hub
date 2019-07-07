@@ -1,5 +1,5 @@
-var PatentHub = artifacts.require('PatentHub');
+var Host = artifacts.require('Host');
 
 module.exports = function(deployer) {
-  deployer.deploy(PatentHub);
+  deployer.deploy(Host);
 };

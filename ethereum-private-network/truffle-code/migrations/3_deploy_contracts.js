@@ -1,5 +1,5 @@
-var Host = artifacts.require('Host');
+var Helper = artifacts.require('Helper');
 
 module.exports = function(deployer) {
-  deployer.deploy(Host);
+  deployer.deploy(Helper);
 };

@@ -5,10 +5,11 @@ import Blockies from "react-blockies";
 
 import HostContainer from "../Host/HostContainer";
 import InventorContainer from "../Inventor/InventorContainer";
-import PatentAgentUIContainer from "../PatentAgent/PatentAgentUIContainer";
-import DrawerUIContainer from "../Drawer/DrawerUIContainer";
-import NationalizerUIContainer from "../Nationalizer/NationalizerUIContainer";
-import TranslatorUIContainer from "../Translator/TranslatorUIContainer";
+import PatentAgentContainer from "../PatentAgent/PatentAgentContainer";
+import DrawerContainer from "../Drawer/DrawerContainer";
+import NationalizerContainer from "../Nationalizer/NationalizerContainer";
+import PatentOfficeContainer from "../PatentOffice/PatentOfficeContainer";
+//import TranslatorContainer from "../Translator/TranslatorContainer";
 
 class Home extends Component {
   constructor(props) {
@@ -37,10 +38,10 @@ class Home extends Component {
       "PatentHub"
     ].methods["isRegisteredAsNationalizer"].cacheCall(this.props.accounts[0]);
     this.setState({ nationalizerDataKey: nationalizerDataKey });
-    var translatorDataKey = this.context.drizzle.contracts["PatentHub"].methods[
+    /*var translatorDataKey = this.context.drizzle.contracts["PatentHub"].methods[
       "isRegisteredAsTranslator"
     ].cacheCall(this.props.accounts[0]);
-    this.setState({ translatorDataKey: translatorDataKey });
+    this.setState({ translatorDataKey: translatorDataKey });*/
     var patentOfficeDataKey = this.context.drizzle.contracts[
       "PatentHub"
     ].methods["isRegisteredAsPatentOffice"].cacheCall(this.props.accounts[0]);
@@ -70,10 +71,10 @@ class Home extends Component {
         this.state.nationalizerDataKey in
         this.props.PatentHub.isRegisteredAsNationalizer
       ) ||
-      !(
+      /*!(
         this.state.translatorDataKey in
         this.props.PatentHub.isRegisteredAsTranslator
-      ) ||
+      ) ||*/
       !(
         this.state.patentOfficeDataKey in
         this.props.PatentHub.isRegisteredAsPatentOffice
@@ -95,9 +96,9 @@ class Home extends Component {
     var nationalizer = this.props.PatentHub.isRegisteredAsNationalizer[
       this.state.nationalizerDataKey
     ].value;
-    var translator = this.props.PatentHub.isRegisteredAsTranslator[
+    /*var translator = this.props.PatentHub.isRegisteredAsTranslator[
       this.state.translatorDataKey
-    ].value;
+    ].value;*/
     var patentOffice = this.props.PatentHub.isRegisteredAsPatentOffice[
       this.state.patentOfficeDataKey
     ].value;
@@ -110,19 +111,21 @@ class Home extends Component {
     } else if (inventor) {
       role = "Inventor";
     } else if (patentAgent) {
-      role = "PatentAgent";
+      role = "Patent Agent";
     } else if (drawer) {
       role = "Drawer";
     } else if (nationalizer) {
       role = "Nationalizer";
-    } else if (translator) {
+    } /*else if (translator) {
       role = "Translator";
-    } else if (patentOffice) {
-      role = "PatentOffice";
+    }*/ else if (patentOffice) {
+      role = "Patent Office";
     }
-
     this.setState({ role: role });
   }
+
+  
+
 
   render() {
     if (this.state.role === undefined) {
@@ -136,7 +139,7 @@ class Home extends Component {
         <div className="pure-g">
           <div className="pure-u-1-1 header">
             <div className="jumbotron">
-              <h1 className="display-4">Patent Hub</h1>
+              <h1 className="display-4">{this.state.role}</h1>
 
               <hr className="my-4" />
               <p className="lead">
@@ -166,29 +169,29 @@ class Home extends Component {
                 <InventorContainer />
               </div>
             )}
-            {this.state.role === "PatentAgent" && (
+            {this.state.role === "Patent Agent" && (
               <div>
-                <PatentAgentUIContainer />
+                <PatentAgentContainer />
               </div>
             )}
             {this.state.role === "Drawer" && (
               <div>
-                <DrawerUIContainer />
+                <DrawerContainer />
               </div>
             )}
-            {this.state.role === "Translator" && (
+            {/*{this.state.role === "Translator" && (
               <div>
-                <TranslatorUIContainer />
+                <TranslatorContainer />
               </div>
-            )}
+            )}*/}
             {this.state.role === "Nationalizer" && (
               <div>
-                <NationalizerUIContainer />
+                <NationalizerContainer />
               </div>
             )}
             {this.state.role === "Patent Office" && (
               <div>
-                <PatentAgentUIContainer />
+                <PatentOfficeContainer />
               </div>
             )}
             <br />
