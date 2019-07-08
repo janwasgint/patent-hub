@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import { getContract } from '../../../../utils/MyContracts.js';
+import { alertEnabled } from "../../../shared.js";
 
 class RegisterInventor extends Component {
   constructor(props) {
@@ -28,7 +29,7 @@ class RegisterInventor extends Component {
         return instance.registerInventor(inventorAddr, { from: account });
       })
       .then(function(result) {
-        alert('Inventor registered successfully! Transaction Hash: ' + result.tx);
+        if (alertEnabled) { alert('Inventor registered successfully! Transaction Hash: ' + result.tx); }
         console.log(result);
       })
       .catch(function(err) {

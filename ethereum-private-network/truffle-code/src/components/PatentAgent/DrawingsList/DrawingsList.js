@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Blockies from "react-blockies";
 
-class ContributionList extends Component {
+class DrawingsList extends Component {
   render() {
     const props = this.props;
     return (
@@ -12,19 +12,19 @@ class ContributionList extends Component {
             {this.props.events.map(function(event, i) {
               return (
                 <li className="media align-middle" key={i}>
-                  <Blockies seed={event.inventor} size={10} scale={10} />
+                  <Blockies seed={event.drawer} size={10} scale={10} />
                   <div className="media-body">
                     <h5 className="align-middle m-2">
-                      {props.mapNameToAddress(event.inventor)}
+                      {props.mapNameToAddress(event.drawer)}
                     </h5>
 
                     <p className="align-middle m-2">
                       <span className="badge badge-secondary">File hash</span>{" "}
-                      {event.ipfsFileHash}
+                      {event.drawingsIpfsFileHash}
                       <button
                         type="button"
                         className="form-control btn btn-secondary"
-                        onClick={() => props.downloadPdf(event.ipfsFileHash)}
+                        onClick={() => props.downloadPdf(event.drawingsIpfsFileHash)}
                       >
                         Download File
                       </button>
@@ -35,15 +35,15 @@ class ContributionList extends Component {
             })}
           </ul>
         ) : (
-          <div>No contributions yet!</div>
+          <div>No drawings yet!</div>
         )}
       </div>
     );
   }
 }
 
-ContributionList.contextTypes = {
+DrawingsList.contextTypes = {
   drizzle: PropTypes.object
 };
 
-export default ContributionList;
+export default DrawingsList;

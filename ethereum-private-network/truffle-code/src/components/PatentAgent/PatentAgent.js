@@ -2,11 +2,12 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 
 import ContributionList from "./ContributionList/ContributionList";
-import SalaryProposal from "./SalaryProposal/SalaryProposal";
+import PaymentProposal from "./PaymentProposal/PaymentProposal";
 import PatentDraftContainer from "./PatentDraft/PatentDraftContainer";
+import DrawingsList from "./DrawingsList/DrawingsList";
 
 import { getContract } from "./../../utils/MyContracts.js";
-import { drawerAddress, nationalizerAddress, mapNameToAddress, ipfsApi } from "../shared.js";
+import { drawerAddress, nationalizerAddress, mapNameToAddress, ipfsApi, downloadPdf, alertEnabled } from "../shared.js";
 
 class PatentAgent extends Component {
   constructor(props) {
@@ -26,11 +27,137 @@ class PatentAgent extends Component {
     this.acceptNationalizerPaymentProposal = this.acceptNationalizerPaymentProposal.bind(this);
     this.captureFile = this.captureFile.bind(this);
     this.saveToIpfs = this.saveToIpfs.bind(this);
-    this.downloadPdf = this.downloadPdf.bind(this);
+    this.downloadPdf = downloadPdf.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
+  }
 
+  saveToIpfs(reader, event) {
+    let ipfsId;
+    const buffer = Buffer.from(reader.result);
+    ipfsApi
+      .add(buffer, {
+        progress: prog => console.log(`received: ${prog}`)
+      })
+      .then(response => {
+        console.log(response);
+        ipfsId = response[0].hash;
+        console.log(ipfsId);
+        this.setState({
+          added_file_hash: ipfsId
+        });
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  }
 
+ captureFile(event) {
+    event.stopPropagation();
+    event.preventDefault();
+    const file = event.target.files[0];
+    let reader = new window.FileReader();
+    reader.onloadend = () => this.saveToIpfs(reader, event);
+    reader.readAsArrayBuffer(file);
+    this.handleChange(event);
+  }
+
+  handleChange(event) {
+    this.setState({ value: event.target.value });
+  }
+
+  acceptDrawerPaymentProposal() {
+    var account = "";
+    this.context.drizzle.web3.eth.getAccounts(function(error, result) {
+      if (error != null) console.log("Could not get accounts!");
+      account = result[0];
+    });
+
+    let addr = drawerAddress
+
+    getContract(this.context.drizzle)
+      .then(function(instance) {
+        return instance.approveContract(addr, {
+          from: account
+        });
+      })
+      .then(function(result) {
+        if (alertEnabled) { alert("Contract and payment approved successfully! Transaction Hash: " + result.tx); }
+        console.log(result);
+      })
+      .catch(function(err) {
+        console.log(err.message);
+      });    
+  }
+
+  acceptNationalizerPaymentProposal() {
+    var account = "";
+    this.context.drizzle.web3.eth.getAccounts(function(error, result) {
+      if (error != null) console.log("Could not get accounts!");
+      account = result[0];
+    });
+
+    let addr = nationalizerAddress
+
+    getContract(this.context.drizzle)
+      .then(function(instance) {
+        return instance.approveContract(addr, {
+          from: account
+        });
+      })
+      .then(function(result) {
+        if (alertEnabled) { alert("Payment and contract approved successfully! Transaction Hash: " + result.tx); }
+        console.log(result);
+      })
+      .catch(function(err) {
+        console.log(err.message);
+      });    
+
+  }
+
+  // Not implemented in the contract yet
+  rejectPaymentProposal() {
+    console.log("rejected");
+  }
+
+  handleSubmit = e => {
+    e.preventDefault();
+    const self = this;
+    var ipfsId = self.state.added_file_hash;
+    console.log(ipfsId);
+
+    var account = "";
+    this.context.drizzle.web3.eth.getAccounts(function(error, result) {
+      if (error != null) console.log("Could not get accounts!");
+      account = result[0];
+    });
+
+    let payment = e.target[0].value;
+
+    getContract(this.context.drizzle)
+      .then(function(instance) {
+        console.log("Sending filehash to contract...");
+        console.log("account", account);
+
+        return instance.uploadInventorsContract(payment, ipfsId, {
+          from: account
+        });
+      })
+      .then(function(result) {
+        if (alertEnabled) { alert(
+          "Contract sent successfully! Transaction Hash: " +
+            result.tx +
+            "\nIpfs File Hash: " +
+            ipfsId
+        ); }
+        console.log(result);
+      })
+      .catch(function(err) {
+        console.log(err.message);
+      });
+  };
+
+  render() {
     // local copy of the events we are interested in
     this.events = {
       contributionAddedSuccessfully: [],
@@ -39,6 +166,7 @@ class PatentAgent extends Component {
       approveNationalizerContractRequest: [],
       drawerContractApproved: [],
       nationalizerContractApproved: [],
+      patentDraftUpdated: [],
     };
 
     // fetch all events we have to listen to from the contract
@@ -61,6 +189,19 @@ class PatentAgent extends Component {
           status: true,
         });
         this.state.showContractRequest = false;
+      }
+    }
+
+    for (var i = 0; i < propsEvents.length; i++) {
+      if (propsEvents[i].event === "patentDraftUpdated") {
+        if (propsEvents[i].returnValues.drawingsIpfsFileHash != "") {
+          if (this.events.patentDraftUpdated == 0) {
+            this.events.patentDraftUpdated.push({
+              drawer: drawerAddress,
+              drawingsIpfsFileHash: propsEvents[i].returnValues.drawingsIpfsFileHash,
+            });
+          }
+        }
       }
     }
 
@@ -104,146 +245,10 @@ class PatentAgent extends Component {
               payment: propsEvents[i].returnValues.payment
             });
             this.state.showAcceptNationalizerContract = false;
-          }
         }
       }
-  }
+    }
 
-  saveToIpfs(reader, event) {
-    let ipfsId;
-    const buffer = Buffer.from(reader.result);
-    ipfsApi
-      .add(buffer, {
-        progress: prog => console.log(`received: ${prog}`)
-      })
-      .then(response => {
-        console.log(response);
-        ipfsId = response[0].hash;
-        console.log(ipfsId);
-        this.setState({
-          added_file_hash: ipfsId
-        });
-      })
-      .catch(err => {
-        console.error(err);
-      });
-  }
-
-  downloadPdf() {
-    ipfsApi.get(this.state.added_file_hash, function(err, files) {
-      files.forEach(file => {
-        console.log(file.path);
-        console.log(file.content.toString("utf8"));
-      });
-    });
-  }
-
- captureFile(event) {
-    event.stopPropagation();
-    event.preventDefault();
-    const file = event.target.files[0];
-    let reader = new window.FileReader();
-    reader.onloadend = () => this.saveToIpfs(reader, event);
-    reader.readAsArrayBuffer(file);
-    this.handleChange(event);
-  }
-
-  handleChange(event) {
-    this.setState({ value: event.target.value });
-  }
-
-  acceptDrawerPaymentProposal() {
-    var account = "";
-    this.context.drizzle.web3.eth.getAccounts(function(error, result) {
-      if (error != null) console.log("Could not get accounts!");
-      account = result[0];
-    });
-
-    let addr = drawerAddress
-
-    getContract(this.context.drizzle)
-      .then(function(instance) {
-        return instance.approveContract(addr, {
-          from: account
-        });
-      })
-      .then(function(result) {
-        alert("Contract and payment approved successfully! Transaction Hash: " + result.tx);
-        console.log(result);
-      })
-      .catch(function(err) {
-        console.log(err.message);
-      });    
-  }
-
-  acceptNationalizerPaymentProposal() {
-    var account = "";
-    this.context.drizzle.web3.eth.getAccounts(function(error, result) {
-      if (error != null) console.log("Could not get accounts!");
-      account = result[0];
-    });
-
-    let addr = nationalizerAddress
-
-    getContract(this.context.drizzle)
-      .then(function(instance) {
-        return instance.approveContract(addr, {
-          from: account
-        });
-      })
-      .then(function(result) {
-        alert("Payment and contract approved successfully! Transaction Hash: " + result.tx);
-        console.log(result);
-      })
-      .catch(function(err) {
-        console.log(err.message);
-      });    
-
-  }
-
-  // Not implemented in the contract yet
-  rejectPaymentProposal() {
-    console.log("rejected");
-  }
-
-  handleSubmit = e => {
-    e.preventDefault();
-    const self = this;
-    var ipfsId = self.state.added_file_hash;
-    console.log(ipfsId);
-
-    var account = "";
-    this.context.drizzle.web3.eth.getAccounts(function(error, result) {
-      if (error != null) console.log("Could not get accounts!");
-      account = result[0];
-    });
-
-    let payment = e.target[0].value;
-
-    getContract(this.context.drizzle)
-      .then(function(instance) {
-        console.log("Sending filehash to contract...");
-        console.log("account", account);
-
-        return instance.uploadInventorsContract(payment, ipfsId, {
-          from: account
-        });
-      })
-      .then(function(result) {
-        alert(
-          "Contract sent successfully! Transaction Hash: " +
-            result.tx +
-            "\nIpfs File Hash: " +
-            ipfsId
-        );
-        console.log(result);
-      })
-      .catch(function(err) {
-        console.log(err.message);
-      });
-  };
-
-  render() {
     return (
       <div>
         {this.state.showContractRequest &&
@@ -263,7 +268,7 @@ class PatentAgent extends Component {
                 <div className="form-group">
                   <label htmlFor="Contract">Contract</label>
                   <br />
-                  <input type="file" onChange={this.captureFile} />
+                  <input type="file" onChange={this.captureFile}/>
                   <label htmlFor="ipfsHash">{this.state.added_file_hash}</label>
                   <p />
                   <button type="submit" className="form-control btn btn-primary">
@@ -292,7 +297,7 @@ class PatentAgent extends Component {
         <div className="card">
           <h5 className="card-header"> Drawer </h5>
           <div className="card-body">
-            <SalaryProposal
+            <PaymentProposal
               events={this.events.approveDrawerContractRequest}
               acceptPaymentProposal={this.acceptDrawerPaymentProposal}
               rejectPaymentProposal={this.rejectPaymentProposal}
@@ -309,7 +314,7 @@ class PatentAgent extends Component {
         <div className="card">
           <h5 className="card-header"> Nationalizer </h5>
           <div className="card-body">
-            <SalaryProposal
+            <PaymentProposal
               events={this.events.approveNationalizerContractRequest}
               acceptPaymentProposal={this.acceptNationalizerPaymentProposal}
               rejectPaymentProposal={this.rejectPaymentProposal}
@@ -329,6 +334,25 @@ class PatentAgent extends Component {
             <PatentDraftContainer />
           </div>
         </div>
+
+        <p />
+
+        {!this.showAcceptDrawerContract &&
+          <div>
+            <div className="card">
+              <h5 className="card-header"> Drawings List </h5>
+              <div className="card-body">
+                <DrawingsList
+                  events={this.events.patentDraftUpdated}
+                  downloadPdf={this.downloadPdf}
+                  mapNameToAddress={address => mapNameToAddress(address)}
+                />
+              </div>
+            </div>
+         
+          </div>
+        }
+    
       </div>
     );
   }

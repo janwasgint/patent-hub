@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 
 import { getContract } from "./../../../utils/MyContracts.js";
-import { nationalizerAddress, ipfsApi } from "../../shared.js";
+import { nationalizerAddress, ipfsApi, alertEnabled } from "../../shared.js";
 
 class PatentDraft extends Component {
   constructor(props) {
@@ -16,26 +16,6 @@ class PatentDraft extends Component {
     this.captureFile = this.captureFile.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.patentDraftFields = this.patentDraftFields.bind(this)
-
-    this.events = {
-      patentDraftUpdated: [],
-    };
-
-    // fetch all events we have to listen to from the contract
-    let propsEvents = this.props.PatentHub.events;
-
-    for (var i = 0; i < propsEvents.length; i++) {
-      if (propsEvents[i].event === "patentDraftUpdated") {      
-        this.events.patentDraftUpdated.push({
-          jurisdiction: propsEvents[i].returnValues.jurisdiction,
-          claimsText: propsEvents[i].returnValues.claimsText,
-          detailedDescriptionText: propsEvents[i].returnValues.detailedDescriptionText,
-          backgroundText: propsEvents[i].returnValues.backgroundText,
-          abstractText: propsEvents[i].returnValues.abstractText,
-          summaryText: propsEvents[i].returnValues.summaryText,
-        });    
-      }
-    } 
   }
 
   saveToIpfs(reader, event) {
@@ -101,15 +81,15 @@ class PatentDraft extends Component {
         console.log("Sending draft to contract...");
         console.log("account", account);
 
-        return instance.setNationalizedDraft(nationalizerAddress, claimsText, detailedDescriptionText, jurisdiction, backgroundText, abstractText, summaryText, "", {
+        return instance.setNationalizedDraft(nationalizerAddress, jurisdiction, claimsText, detailedDescriptionText, backgroundText, abstractText, summaryText, "", {
           from: account
         });
       })
       .then(function(result) {
-        alert(
+        if (alertEnabled) { alert(
           "Draft sent successfully! Transaction Hash: " +
             result.tx
-        );
+        ); }
         console.log(result);
       })
       .catch(function(err) {
@@ -148,6 +128,26 @@ class PatentDraft extends Component {
   }
 
   render() {
+    this.events = {
+      patentDraftUpdated: [],
+    };
+
+    // fetch all events we have to listen to from the contract
+    let propsEvents = this.props.PatentHub.events;
+
+    for (var i = 0; i < propsEvents.length; i++) {
+      if (propsEvents[i].event === "patentDraftUpdated") {      
+        this.events.patentDraftUpdated.push({
+          jurisdiction: propsEvents[i].returnValues.jurisdiction,
+          claimsText: propsEvents[i].returnValues.claimsText,
+          detailedDescriptionText: propsEvents[i].returnValues.detailedDescriptionText,
+          backgroundText: propsEvents[i].returnValues.backgroundText,
+          abstractText: propsEvents[i].returnValues.abstractText,
+          summaryText: propsEvents[i].returnValues.summaryText,
+        });    
+      }
+    } 
+
     var events = this.props.events;
     return (
       <div className="form-group">

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import { getContract } from '../../../../utils/MyContracts.js';
+import { alertEnabled } from "../../../shared.js";
 
 class RegisterDrawer extends Component {
   constructor(props) {
@@ -28,13 +29,14 @@ class RegisterDrawer extends Component {
         return instance.registerDrawer(drawerAddr, { from: account });
       })
       .then(function(result) {
-        alert('Drawer registered successfully! Transaction Hash: ' + result.tx);
+        if (alertEnabled) { alert('Drawer registered successfully! Transaction Hash: ' + result.tx); }
         console.log(result);
       })
       .catch(function(err) {
         console.log(err.message);
       });
   };
+
   render() {
     return (
       <div>

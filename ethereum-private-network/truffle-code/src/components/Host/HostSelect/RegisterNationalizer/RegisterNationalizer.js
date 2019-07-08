@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import { getContract } from '../../../../utils/MyContracts.js';
+import { alertEnabled } from "../../../shared.js";
 
 class RegisterNationalizer extends Component {
   constructor(props) {
@@ -28,13 +29,14 @@ class RegisterNationalizer extends Component {
         return instance.registerNationalizer(nationalizerAddr, { from: account });
       })
       .then(function(result) {
-        alert('Nationalizer registered successfully! Transaction Hash: ' + result.tx);
+        if (alertEnabled) { alert('Nationalizer registered successfully! Transaction Hash: ' + result.tx); }
         console.log(result);
       })
       .catch(function(err) {
         console.log(err.message);
       });
   };
+
   render() {
     return (
       <div>

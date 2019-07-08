@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 
 import { getContract } from "./../../../utils/MyContracts.js";
-import { ipfsApi } from "../../shared.js";
+import { ipfsApi, alertEnabled } from "../../shared.js";
 
 class PatentDraft extends Component {
   constructor(props) {
@@ -17,25 +17,6 @@ class PatentDraft extends Component {
     this.captureFile = this.captureFile.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.patentDraftFields = this.patentDraftFields.bind(this)
-
-    // fetch all events we have to listen to from the contract
-    let propsEvents = this.props.PatentHub.events;
-
-    this.events = {
-      patentDraftUpdated: [],
-    };
-
-    for (var i = 0; i < propsEvents.length; i++) {
-      if (propsEvents[i].event === "patentDraftUpdated") {      
-        this.events.patentDraftUpdated.push({
-          claimsText: propsEvents[i].returnValues.claimsText,
-          detailedDescriptionText: propsEvents[i].returnValues.detailedDescriptionText,
-          backgroundText: propsEvents[i].returnValues.backgroundText,
-          abstractText: propsEvents[i].returnValues.abstractText,
-          summaryText: propsEvents[i].returnValues.summaryText,
-        });    
-      }
-    } 
   }
 
   saveToIpfs(reader, event) {
@@ -104,10 +85,10 @@ class PatentDraft extends Component {
         });
       })
       .then(function(result) {
-        alert(
+        if (alertEnabled) { alert(
           "Draft sent successfully! Transaction Hash: " +
             result.tx
-        );
+        ); }
         console.log(result);
       })
       .catch(function(err) {
@@ -145,6 +126,25 @@ class PatentDraft extends Component {
   }
 
   render() {
+    this.events = {
+      patentDraftUpdated: [],
+    };
+
+    // fetch all events we have to listen to from the contract
+    let propsEvents = this.props.PatentHub.events;
+
+    for (var i = 0; i < propsEvents.length; i++) {
+      if (propsEvents[i].event === "patentDraftUpdated") {      
+        this.events.patentDraftUpdated.push({
+          claimsText: propsEvents[i].returnValues.claimsText,
+          detailedDescriptionText: propsEvents[i].returnValues.detailedDescriptionText,
+          backgroundText: propsEvents[i].returnValues.backgroundText,
+          abstractText: propsEvents[i].returnValues.abstractText,
+          summaryText: propsEvents[i].returnValues.summaryText,
+        });    
+      }
+    } 
+
     var events = this.props.events;
     return (
       <div className="form-group">

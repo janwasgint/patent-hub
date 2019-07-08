@@ -8,7 +8,13 @@ class Host extends Component {
     super(props);
 
     this.handleChange = this.handleChange.bind(this);
+  }
 
+  handleChange(event) {
+    this.setState({ value: event.target.value });
+  }
+
+  render() {
     // local copy of the events we are interested in
     this.events = {
       participantRegistered: [],
@@ -27,19 +33,12 @@ class Host extends Component {
         });
       }
     }
-    console.log(this.events.participantRegistered);
-  }
 
-  handleChange(event) {
-    this.setState({ value: event.target.value });
-  }
-
-  render() {
     return (
       <div>
         <div>
           <p>
-            <strong>Register Actor</strong>:
+            <strong>Register Participant</strong>:
           </p>
           <HostSelect />
         </div>

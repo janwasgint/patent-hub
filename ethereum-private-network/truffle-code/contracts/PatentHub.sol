@@ -54,15 +54,21 @@ contract PatentHub is Host {
     
     // when a shares proposal was submitted
     event sharesProposalSubmitted(address indexed proposingInventor, address indexed shareHolder, uint percentage);
+
+    // when a shares proposal is accepted
+    event sharesProposalAccepted(address indexed inventor);
     
     // when all shares are accepted
-	event contributionPhaseFinished();
+	  event contributionPhaseFinished();
 
 
     // ***** PATENT AGENT CONTRACTING PHASE *****
 	        
     // when inventors need to approve a contract
     event approvePatentAgentContractRequest(address indexed patentAgent, uint payment, string ipfsFileHash);
+
+    // when one party consented to the linked contract
+    event patentAgentOneInventorContractApproved(address indexed inventor);
 
     // when all parties consented to the linked contract
     event patentAgentInventorsContractApproved(string ipfsFileHash);
@@ -209,6 +215,7 @@ contract PatentHub is Host {
 		for (uint i=0; i<shares.length; i++) {
 			if (shares[i].shareholder == msg.sender) {
 				shares[i].accepted = true;
+        emit sharesProposalAccepted(msg.sender);
 			}
 			shareProposalAcceptedByAll = shareProposalAcceptedByAll && shares[i].accepted;
         }
@@ -232,7 +239,7 @@ contract PatentHub is Host {
 	function approvePatentAgentContract() public onlyInventor() {	
 		require(shareProposalAcceptedByAll && patentAgentInventorsContract.signed == false);
 		patentAgentInventorsContract.inventorsConsent[msg.sender] = true;
-
+    emit patentAgentOneInventorContractApproved(msg.sender);
 		bool allInventorsConsented = true;
 		for (uint i = 0; i < allInventors.length; i++) {
 			allInventorsConsented = allInventorsConsented && patentAgentInventorsContract.inventorsConsent[allInventors[i]];

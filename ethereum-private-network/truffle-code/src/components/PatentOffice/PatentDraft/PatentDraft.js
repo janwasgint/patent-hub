@@ -16,26 +16,6 @@ class PatentDraft extends Component {
     this.captureFile = this.captureFile.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.patentDraftFields = this.patentDraftFields.bind(this)
-
-    this.events = {
-      patentDraftUpdated: [],
-    };
-
-    // fetch all events we have to listen to from the contract
-    let propsEvents = this.props.PatentHub.events;
-
-    for (var i = 0; i < propsEvents.length; i++) {
-      if (propsEvents[i].event === "patentDraftUpdated") {      
-        this.events.patentDraftUpdated.push({
-          jurisdiction: propsEvents[i].returnValues.jurisdiction,
-          claimsText: propsEvents[i].returnValues.claimsText,
-          detailedDescriptionText: propsEvents[i].returnValues.detailedDescriptionText,
-          backgroundText: propsEvents[i].returnValues.backgroundText,
-          abstractText: propsEvents[i].returnValues.abstractText,
-          summaryText: propsEvents[i].returnValues.summaryText,
-        });    
-      }
-    } 
   }
 
   saveToIpfs(reader, event) {
@@ -149,6 +129,26 @@ class PatentDraft extends Component {
   }
 
   render() {
+    this.events = {
+      patentDraftUpdated: [],
+    };
+
+    // fetch all events we have to listen to from the contract
+    let propsEvents = this.props.PatentHub.events;
+
+    for (var i = 0; i < propsEvents.length; i++) {
+      if (propsEvents[i].event === "patentDraftUpdated") {      
+        this.events.patentDraftUpdated.push({
+          jurisdiction: propsEvents[i].returnValues.jurisdiction,
+          claimsText: propsEvents[i].returnValues.claimsText,
+          detailedDescriptionText: propsEvents[i].returnValues.detailedDescriptionText,
+          backgroundText: propsEvents[i].returnValues.backgroundText,
+          abstractText: propsEvents[i].returnValues.abstractText,
+          summaryText: propsEvents[i].returnValues.summaryText,
+        });    
+      }
+    } 
+
     var events = this.props.events;
     return (
       <div className="form-group">

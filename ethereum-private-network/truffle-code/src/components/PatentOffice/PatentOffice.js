@@ -5,7 +5,7 @@ import PatentDraftContainer from "./PatentDraft/PatentDraftContainer";
 import DrawingsList from "./DrawingsList/DrawingsList";
 
 import { getContract } from "./../../utils/MyContracts.js";
-import { drawerAddress, nationalizerAddress, mapNameToAddress, ipfsApi } from "../shared.js";
+import { drawerAddress, nationalizerAddress, mapNameToAddress, ipfsApi, downloadPdf, enableAlert } from "../shared.js";
 
 class PatentOffice extends Component {
   constructor(props) {
@@ -14,54 +14,15 @@ class PatentOffice extends Component {
       added_file_hash: "",
       value: "",
       showFeeRequest: true,
+      showAcceptPatent: true,
     };
 
     // bind methods
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
-    this.downloadPdf = this.downloadPdf.bind(this);
+    this.downloadPdf = downloadPdf.bind(this);
     this.approvePatent = this.approvePatent.bind(this)
-
-    // local copy of the events we are interested in
-    this.events = {
-      feePaid: [],
-      patentDraftUpdated: [],
-    };
-
-    // fetch all events we have to listen to from the contract
-    let propsEvents = this.props.PatentHub.events;
-    
-    for (var i = 0; i < propsEvents.length; i++) {
-      if (propsEvents[i].event === "feePaid") {
-        this.events.feePaid.push({
-          status: true
-        });
-        this.state.showFeeRequest = false;
-      }
-    }
-
-   for (var i = 0; i < propsEvents.length; i++) {
-      if (propsEvents[i].event === "patentDraftUpdated") {
-        if (propsEvents[i].returnValues.drawingsIpfsFileHash != "") {
-          if (this.events.patentDraftUpdated == 0) {
-            this.events.patentDraftUpdated.push({
-              drawer: drawerAddress,
-              drawingsIpfsFileHash: propsEvents[i].returnValues.drawingsIpfsFileHash,
-            });
-          }
-        }
-      }
-    }
   }
-
-  downloadPdf() {
-    ipfsApi.get(this.state.added_file_hash, function(err, files) {
-      files.forEach(file => {
-        console.log(file.path);
-        console.log(file.content.toString("utf8"));
-      });
-    });
-  };
 
   handleChange(event) {
     this.setState({ value: event.target.value });
@@ -92,12 +53,12 @@ class PatentOffice extends Component {
         });
       })
       .then(function(result) {
-        alert(
+        if (enableAlert) { alert(
           "Payment request sent successfully! Transaction Hash: " +
             result.tx
-        );
+        ); }
         console.log(result);
-      })
+      }) 
       .catch(function(err) {
         console.log(err.message);
       });
@@ -117,7 +78,7 @@ class PatentOffice extends Component {
         });
       })
       .then(function(result) {
-        alert("Patent approved successfully! Transaction Hash: " + result.tx);
+        if (enableAlert) { alert("Patent approved successfully! Transaction Hash: " + result.tx); }
         console.log(result);
       })
       .catch(function(err) {
@@ -131,6 +92,47 @@ class PatentOffice extends Component {
   }
 
   render() {
+    // local copy of the events we are interested in
+    this.events = {
+      feePaid: [],
+      patentDraftUpdated: [],
+      nationalPatentAccepted: []
+    };
+
+    // fetch all events we have to listen to from the contract
+    let propsEvents = this.props.PatentHub.events;
+    
+    for (var i = 0; i < propsEvents.length; i++) {
+      if (propsEvents[i].event === "feePaid") {
+        this.events.feePaid.push({
+          status: true
+        });
+        this.state.showFeeRequest = false;
+      }
+    }
+
+   for (var i = 0; i < propsEvents.length; i++) {
+      if (propsEvents[i].event === "patentDraftUpdated") {
+        if (propsEvents[i].returnValues.drawingsIpfsFileHash != "") {
+          if (this.events.patentDraftUpdated == 0) {
+            this.events.patentDraftUpdated.push({
+              drawer: drawerAddress,
+              drawingsIpfsFileHash: propsEvents[i].returnValues.drawingsIpfsFileHash,
+            });
+          }
+        }
+      }
+    }
+
+    for (var i = 0; i < propsEvents.length; i++) {
+      if (propsEvents[i].event === "nationalPatentAccepted") {
+        this.events.nationalPatentAccepted.push({
+          status: true
+        });
+        this.state.showAcceptPatent = false;
+      }
+    }
+
     return (
         <div>
         {this.state.showFeeRequest &&
@@ -183,31 +185,40 @@ class PatentOffice extends Component {
 
             <p />
 
-            <div className="card-header">
-              <form>
-                <div className="row">
-                  <div className="col">
-                    <button
-                      type="button"
-                      className="form-control btn btn-success"
-                      onClick={this.approvePatent}
-                    >
-                      Approve
-                    </button>
+            {this.state.showAcceptPatent && (
+              <div className="card-header">
+                <form>
+                  <div className="row">
+                    <div className="col">
+                      <button
+                        type="button"
+                        className="form-control btn btn-success"
+                        onClick={this.approvePatent}
+                      >
+                        Approve
+                      </button>
+                    </div>
+                    <div className="col">
+                      <button
+                        type="button"
+                        className="form-control btn btn-danger"
+                        onClick={this.rejectPatent}
+                      >
+                        Reject
+                      </button>
+                    </div>
                   </div>
-                  <div className="col">
-                    <button
-                      type="button"
-                      className="form-control btn btn-danger"
-                      onClick={this.rejectPatent}
-                    >
-                      Reject
-                    </button>
-                  </div>
+                </form>
+              </div>
+            )}
+
+            {!this.state.showAcceptPatent && (
+              <div>
+                <div className="alert alert-success" role="alert">
+                  Patent approved!
                 </div>
-              </form>
-            </div>
-         
+              </div>
+            )}       
           </div>
         }
         </div>

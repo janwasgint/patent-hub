@@ -43,6 +43,13 @@ const drizzleOptions = {
         }
       },
       {
+        eventName: 'sharesProposalAccepted',
+        eventOptions: {
+          fromBlock: 0,
+          toBlock: 'latest'
+        }
+      },
+      {
         eventName: 'contributionPhaseFinished',
         eventOptions: {
           fromBlock: 0,
@@ -51,6 +58,13 @@ const drizzleOptions = {
       },
       {
         eventName: 'approvePatentAgentContractRequest',
+        eventOptions: {
+          fromBlock: 0,
+          toBlock: 'latest'
+        }
+      },
+      {
+        eventName: 'patentAgentOneInventorContractApproved',
         eventOptions: {
           fromBlock: 0,
           toBlock: 'latest'

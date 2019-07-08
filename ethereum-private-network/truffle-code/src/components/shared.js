@@ -22,8 +22,9 @@ const actorsAndRoles = {
   "0xf11e2da93e64f102016b44bab37d1166a497cf8a": "Patent Office"
 };
 
-const ipfs_API = require("ipfs-api");
-const ipfsApi = ipfs_API("172.16.0.2", "5001", "https"); //ipfs_API("localhost", 5001, "https");
+const IPFS_API = require("ipfs-api");
+const ipfsApi = IPFS_API("172.16.0.2", "5001", "https"); //ipfs_API("localhost", 5001, "https");
+const alertEnabled = false;
 
 const mapNameToAddress = function mapNameToAddress(address) {
   var actorName;
@@ -35,6 +36,15 @@ const mapNameToAddress = function mapNameToAddress(address) {
   return actorName;
 };
 
+const downloadPdf = function downloadPdf(ipfsFileHash) {
+  ipfsApi.get(ipfsFileHash, function(err, files) {
+    files.forEach(file => {
+      console.log(file.path);
+      console.log(file.content.toString("utf8"));
+    });
+  });
+};
+
 export {
   patentAgentAddress,
   drawerAddress,
@@ -42,5 +52,7 @@ export {
   actorsAndAddress,
   actorsAndRoles,
   mapNameToAddress,
-  ipfsApi
+  ipfsApi,
+  downloadPdf,
+  alertEnabled
 };

@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 
-class SalaryProposal extends Component {
+class PaymentProposal extends Component {
   render() {
     var events = this.props.events;
     var lastProposal = events[events.length - 1];
@@ -57,7 +57,7 @@ class SalaryProposal extends Component {
             {!this.props.showAcceptProposal && (
               <div>
                 <div className="alert alert-success" role="alert">
-                  Contract and salary proposal has been accepted.
+                  Payment and contract proposal have been accepted!
                 </div>
               </div>
             )}
@@ -70,8 +70,8 @@ class SalaryProposal extends Component {
   }
 }
 
-SalaryProposal.contextTypes = {
+PaymentProposal.contextTypes = {
   drizzle: PropTypes.object
 };
 
-export default SalaryProposal;
+export default PaymentProposal;

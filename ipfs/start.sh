@@ -9,7 +9,7 @@ docker run -d --name ipfs-node \
   -p 8080:8080 -p 4001:4001 -p 5001:5001 \
   ipfs/go-ipfs:latest
 
-sleep 2
+sleep 5
 docker exec ipfs-node ipfs config Addresses.API /ip4/0.0.0.0/tcp/5001
 docker exec ipfs-node ipfs config Addresses.Gateway /ip4/0.0.0.0/tcp/8080
 docker exec ipfs-node ipfs config --json API.HTTPHeaders.Access-Control-Allow-Origin '["*"]'

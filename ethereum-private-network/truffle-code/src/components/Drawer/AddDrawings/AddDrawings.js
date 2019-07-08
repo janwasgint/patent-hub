@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 
 import { getContract } from "./../../../utils/MyContracts.js";
-import { ipfsApi } from "../../shared.js";
+import { ipfsApi, alertEnabled } from "../../shared.js";
 
 class AddDrawings extends Component {
   constructor(props) {
@@ -45,12 +45,12 @@ class AddDrawings extends Component {
         });
       })
       .then(function(result) {
-        alert(
+        if (alertEnabled) { alert(
           "Drawings added successfully! Transaction Hash: " +
             result.tx +
             "\nIpfs File Hash: " +
             ipfsId
-        );
+        ); }
         console.log(result);
       })
       .catch(function(err) {

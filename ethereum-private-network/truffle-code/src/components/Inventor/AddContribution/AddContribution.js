@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 
 import { getContract } from "./../../../utils/MyContracts.js";
-import { ipfsApi } from "../../shared.js";
+import { ipfsApi, alertEnabled } from "../../shared.js";
 
 class AddContribution extends Component {
   constructor(props) {
@@ -76,16 +76,20 @@ class AddContribution extends Component {
         });
       })
       .then(function(result) {
-        alert(
+        if (alertEnabled) { alert(
           "Contribution added successfully! Transaction Hash: " +
             result.tx +
             "\nIpfs File Hash: " +
             ipfsId
-        );
+        ); }
         console.log(result);
+        self.state.added_file_hash = "";
+        self.fileInput.value = "";
       })
       .catch(function(err) {
         console.log(err.message);
+        self.state.added_file_hash = "";
+        self.fileInput.value = "";
       });
   };
 
@@ -97,7 +101,7 @@ class AddContribution extends Component {
     return (
       <div className="form-group">
         <form id="captureMedia" onSubmit={this.handleSubmit}>
-          <input type="file" onChange={this.captureFile} />{" "}
+          <input type="file" onChange={this.captureFile} ref={ref => this.fileInput = ref}/>{" "}
         </form>{" "}
         <label onChange={this.handleChange} htmlFor="ipfsHash">
           {" "}

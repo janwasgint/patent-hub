@@ -33,7 +33,7 @@ class FeeProposal extends Component {
             {!this.props.showAcceptFee && (
               <div>
                 <div className="alert alert-success" role="alert">
-                  Fee proposal has been accepted.
+                  Fee has been payed!
                 </div>
               </div>
             )}

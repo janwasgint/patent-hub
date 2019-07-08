@@ -6,17 +6,11 @@ import AddDrawingsContainer from "./AddDrawings/AddDrawingsContainer";
 import DrawingsList from "./DrawingsList/DrawingsList";
 
 import { getContract } from "./../../utils/MyContracts.js";
-import { patentAgentAddress, drawerAddress, nationalizerAddress, actorsAndAddress, mapNameToAddress, ipfsApi } from "../shared.js";
+import { patentAgentAddress, drawerAddress, nationalizerAddress, actorsAndAddress, mapNameToAddress, ipfsApi, downloadPdf, alertEnabled } from "../shared.js";
 
 class Drawer extends Component {
   constructor(props) {
     super(props);
-
-    // local copy of the events we are interested in
-    this.events = {
-      drawerContractApproved: [],
-      patentDraftUpdated: [],
-    };
 
     this.state = {
       added_file_hash: "",
@@ -29,35 +23,7 @@ class Drawer extends Component {
     this.saveToIpfs = this.saveToIpfs.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
-    this.downloadPdf = this.downloadPdf.bind(this);
-
-    // fetch all events we have to listen to from the contract
-    let propsEvents = this.props.PatentHub.events;
-    
-    // emit contractApproved(proposerAddress, contr.proposerPersona, msg.sender, contr.approverPersona, contr.ipfsFileHash);
-    for (var i = 0; i < propsEvents.length; i++) {
-      if (propsEvents[i].event === "contractApproved") {
-        if (propsEvents[i].returnValues.proposerPersona == "drawer") {
-          this.events.drawerContractApproved.push({
-            status: true
-          });
-          this.state.showContractRequest = false;
-        }
-      }
-    }
-
-   for (var i = 0; i < propsEvents.length; i++) {
-      if (propsEvents[i].event === "patentDraftUpdated") {
-        if (propsEvents[i].returnValues.drawingsIpfsFileHash != "") {
-          if (this.events.patentDraftUpdated == 0) {
-            this.events.patentDraftUpdated.push({
-              drawer: drawerAddress,
-              drawingsIpfsFileHash: propsEvents[i].returnValues.drawingsIpfsFileHash,
-            });
-          }
-        }
-      }
-    }
+    this.downloadPdf = downloadPdf.bind(this);    
   }
 
   saveToIpfs(reader, event) {
@@ -78,15 +44,6 @@ class Drawer extends Component {
       .catch(err => {
         console.error(err);
       });
-  };
-
-  downloadPdf() {
-    ipfsApi.get(this.state.added_file_hash, function(err, files) {
-      files.forEach(file => {
-        console.log(file.path);
-        console.log(file.content.toString("utf8"));
-      });
-    });
   };
 
   captureFile(event) {
@@ -128,12 +85,12 @@ class Drawer extends Component {
         });
       })
       .then(function(result) {
-        alert(
+        if (alertEnabled) { alert(
           "Contract sent successfully! Transaction Hash: " +
             result.tx +
             "\nIpfs File Hash: " +
             ipfsId
-        );
+        ); }
         console.log(result);
       })
       .catch(function(err) {
@@ -142,6 +99,39 @@ class Drawer extends Component {
   };
 
   render() {
+    // local copy of the events we are interested in
+    this.events = {
+      drawerContractApproved: [],
+      patentDraftUpdated: [],
+    };
+
+    // fetch all events we have to listen to from the contract
+    let propsEvents = this.props.PatentHub.events;
+    
+    // emit contractApproved(proposerAddress, contr.proposerPersona, msg.sender, contr.approverPersona, contr.ipfsFileHash);
+    for (var i = 0; i < propsEvents.length; i++) {
+      if (propsEvents[i].event === "contractApproved") {
+        if (propsEvents[i].returnValues.proposerPersona == "drawer") {
+          this.events.drawerContractApproved.push({
+            status: true
+          });
+          this.state.showContractRequest = false;
+        }
+      }
+    }
+
+   for (var i = 0; i < propsEvents.length; i++) {
+      if (propsEvents[i].event === "patentDraftUpdated") {
+        if (propsEvents[i].returnValues.drawingsIpfsFileHash != "") {
+          if (this.events.patentDraftUpdated == 0) {
+            this.events.patentDraftUpdated.push({
+              drawer: drawerAddress,
+              drawingsIpfsFileHash: propsEvents[i].returnValues.drawingsIpfsFileHash,
+            });
+          }
+        }
+      }
+    }
     return (
         <div>
         {this.state.showContractRequest &&
@@ -162,7 +152,7 @@ class Drawer extends Component {
                   <div className="form-group">
                     <label htmlFor="Contract">Contract</label>
                     <br />
-                    <input type="file" onChange={this.captureFile} />
+                    <input type="file" onChange={this.captureFile}/>
                     <label htmlFor="ipfsHash">{this.state.added_file_hash}</label>
                     <p />
                     <button type="submit" className="form-control btn btn-primary">
