@@ -37,8 +37,10 @@ You can run IPFS either in a container or in the localhost.
 #### Container
 
 Open */ethereum-private-network/truffle-code/src/components/shared.js*
+
 Find the comment `For DOCKER CONTAINER IPFS use:`.
 Make sure the line below is _not_ commented out.
+
 Find the comment `For LOCALHOST IPFS use:`.
 Make sure the line below _is_ commented out.
 
@@ -47,8 +49,10 @@ In the root directory run `sh ipfs/start.sh`.
 #### Localhost
 
 Open */ethereum-private-network/truffle-code/src/components/shared.js*
+
 Find the comment `For DOCKER CONTAINER IPFS use:`.
 Make sure the line below _is_ commented out.
+
 Find the comment `For LOCALHOST IPFS use:`.
 Make sure the line below is _not_ commented out.
 
