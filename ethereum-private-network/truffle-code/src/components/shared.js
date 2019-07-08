@@ -23,7 +23,18 @@ const actorsAndRoles = {
 };
 
 const IPFS_API = require("ipfs-api");
-const ipfsApi = IPFS_API("172.16.0.2", "5001", "https"); //ipfs_API("localhost", 5001, "https");
+
+
+// ---------------------------------------------------------------------------------------
+// For DOCKER CONTAINER IPFS use:
+const ipfsApi = ipfs_API("172.16.0.2", 5001, "https");
+// For LOCALHOST IPFS use:
+// const ipfsApi = ipfs_API("localhost", 5001, "https");
+// ---------------------------------------------------------------------------------------
+// Comment out the respective other line.
+// ---------------------------------------------------------------------------------------
+
+
 const alertEnabled = false;
 
 const mapNameToAddress = function mapNameToAddress(address) {
