@@ -34,13 +34,13 @@ docker exec truffle-dev yarn install
 
 You can run IPFS either in a container or in the localhost.
 
-* Container
+#### Container
 
 In the root directory run `sh ipfs/start.sh`.
 Edit */ethereum-private-network/truffle-code/src/components/shared.js* according to your configuration.
 
 
-* Localhost
+#### Localhost
 
 Install IPFS and run the following commands:
 ```
