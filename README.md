@@ -4,6 +4,12 @@ Ethereum Dapp to facilitate the process of patent creation by maintaining an unf
 
 ---------------------------------------------------------------------------------------------------------
 
+## Architecture
+
+![](https://github.com/janwasgint/patent-hub/blob/Development/documentation/0_architecture_diagram.png)
+
+---------------------------------------------------------------------------------------------------------
+
 ## Requirements
 
 *   docker (version >= 18.09.5)
@@ -132,5 +138,11 @@ docker rm truffle-dev
 
 docker network rm blc-dev-env
 ```
+
+---------------------------------------------------------------------------------------------------------
+
+## Stop and remove shortcut
+
+To conveniently stop and remove all containers, you may also use provided script `stop_and_uninstall.sh`.
 
 ---------------------------------------------------------------------------------------------------------
