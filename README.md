@@ -146,3 +146,10 @@ docker network rm blc-dev-env
 To conveniently stop and remove all containers, you may also use provided script `stop_and_uninstall.sh`.
 
 ---------------------------------------------------------------------------------------------------------
+
+## Known Issues
+
+- The Download Buttons don't work.
+- The Smart Contract (PatentHub.sol) implements a stakeholder called "Translator", which is skipped in the Frontend. This wouldn't have added any benefit for the demo use case as the role has the same actions as the "Nationalizer". For the same reason, the frontend doesn't support the Contract's ability for multiple Nationalizer/Translator/Patent Office pairs for different jurisdictions.
+
+---------------------------------------------------------------------------------------------------------
