@@ -60,7 +60,7 @@
     "eth-block-tracker-es5": "^2.3.2",
     "eth-ecies": "^1.0.3",
     "ethereumjs-util": "^5.2.0",
-    "ipfs": "^0.29.3",
+    "ipfs": "^0.66.1",
     "is-plain-object": "^2.0.4",
     "pdfjs-dist": "2.0.489",
     "react": "^15.4.2",
